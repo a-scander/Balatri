@@ -13,8 +13,7 @@ public class Hand {
     }
     
     public boolean addCard(List<Card> deck) {
-    	IO.println(this.cards.size() + deck.size());
-        if (this.cards.size() + deck.size()-1 < this.maxSize) {
+    	if (this.cards.size() + deck.size() <= this.maxSize) {
             this.cards.addAll(deck);
             return true; 
         }
