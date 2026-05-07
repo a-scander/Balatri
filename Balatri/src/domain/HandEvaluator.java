@@ -2,19 +2,19 @@ package domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*Quatre doigts: les suites et couleurs peuvent scorer avec seulement 4 cartes
+ Raccourci: Les suites  */
+
 public class HandEvaluator {
 
-    public static HandType evaluate(List<Card> cards) {
-        if (cards.size() != 5) {
-            throw new IllegalArgumentException("Une main doit contenir exactement 5 cartes");
-        }
-
+    public static HandType evaluate(List<Card> cards/*, List<Config> configs*/) {
         boolean isFlush    = checkFlush(cards);
-        boolean isStraight = checkStraight(cards);
+        boolean isStraight = checkStraightBetter(cards);
 
         if (isFlush && isStraight) return HandType.STRAIGHT_FLUSH;
         if (checkFourOfAKind(cards))  return HandType.FOUR_OF_A_KIND;
@@ -29,6 +29,8 @@ public class HandEvaluator {
     }
 //Couleur
     private static boolean checkFlush(List<Card> cards) {
+        return CardUtils.groupBySuit(cards).keySet().size() == 1;
+        /*
         Suit first = cards.get(0).suit();
         
         for (Card c : cards) {
@@ -36,9 +38,28 @@ public class HandEvaluator {
                 return false; 
             }
         }
-        return true; 
+
+        return true; */
     }
 //Suite
+    private static boolean checkStraightBetter(List<Card> cards/*, StraightConfig config */) {
+        List<Card> distinctCards = CardUtils.sortedUniqueValues(cards);
+        
+        if(distinctCards.size() != 5 /*config.requiredCardNumber */){
+            return false;
+        }
+
+        Card high = CardUtils.getHighestCard(distinctCards);
+        Card low = CardUtils.getLowestCard(distinctCards);
+        if(high.isAce() && high.rank().getValue() - low.rank().getValue() != 4){
+            distinctCards.remove(high);
+            Card newHigh = CardUtils.getHighestCard(distinctCards);
+            return newHigh.rank().getValue() - low.rank().getValue() == 3; /* 1, 2 - 5 */
+        }
+
+        return high.rank().getValue() - low.rank().getValue() == 4;
+    }
+
     private static boolean checkStraight(List<Card> cards) {
         List<Integer> values = new ArrayList<>();
 
@@ -64,7 +85,8 @@ public class HandEvaluator {
     }
     
 //Number rank
-    private static Map<Rank, Integer> getRankCounts(List<Card> cards) {
+    // placed in CardsUtils
+    /*private static Map<Rank, Integer> getRankCounts(List<Card> cards) {
         Map<Rank, Integer> counts = new HashMap<>();
 
         for (Card card : cards) {
@@ -75,37 +97,41 @@ public class HandEvaluator {
         }
 
         return counts;
-    }
+    }*/
     
     //Carre
     private static boolean checkFourOfAKind(List<Card> cards) {
-        return getRankCounts(cards).containsValue(4);
+        return CardUtils.getRankCounts(cards).containsValue(4L);
     }
 
     //Full 
     private static boolean checkFullHouse(List<Card> cards) {
-        Map<Rank, Integer> counts = getRankCounts(cards);
-        return counts.containsValue(3) && counts.containsValue(2);
+        Map<Integer, Long> counts = CardUtils.getRankCounts(cards);
+        return counts.containsValue(3L) && counts.containsValue(2L);
     }
 //Brelan
     private static boolean checkThreeOfAKind(List<Card> cards) {
-        return getRankCounts(cards).containsValue(3);
+        return CardUtils.getRankCounts(cards).containsValue(3L);
     }
 //Double paire
     private static boolean checkTwoPair(List<Card> cards) {
         int pairCount = 0;
 
-        for (Integer count : getRankCounts(cards).values()) {
+        for (Long count : CardUtils.getRankCounts(cards).values()) {
             
             if (count == 2) { 
                 pairCount++;
+
+                if(pairCount == 2) return true;
             }
         }
-        return pairCount == 2;
+
+        return false;
+        
     }
     
 //Paire
     private static boolean checkPair(List<Card> cards) {
-        return getRankCounts(cards).containsValue(2);
+        return CardUtils.getRankCounts(cards).containsValue(2);
     }
 }

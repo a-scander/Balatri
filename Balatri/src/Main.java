@@ -1,3 +1,4 @@
+import domain.CardUtils;
 import domain.Deck;
 import domain.Hand;
 
@@ -14,7 +15,7 @@ public class Main {
 			deck.discardCards(hand.discardHand());
 			IO.println(hand.getCards());
 			
-			IO.println("pioche : " + deck.deckCards());
-			IO.println("defausse : " + deck.getDiscardCards());
+			IO.println("pioche : " + CardUtils.cardsToString(deck.deckCards()));
+			IO.println("defausse : " + CardUtils.cardsToString(deck.getDiscardCards()));
 	}
 }

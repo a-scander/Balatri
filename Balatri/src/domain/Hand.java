@@ -35,7 +35,7 @@ public class Hand {
 
     public List<Card> sortHand() {
         var sortedHand = new ArrayList<>(cards);
-        sortedHand.sort(Comparator.comparingInt(card -> card.rank().getValue()));
+        CardUtils.sort(sortedHand);
         return Collections.unmodifiableList(sortedHand);
     }
 
@@ -44,7 +44,5 @@ public class Hand {
         return "[" + sortHand().stream()
                 .map(Card::toString)
                 .collect(Collectors.joining(", ")) + "]";
-    }
-    
-    
+    }    
 }

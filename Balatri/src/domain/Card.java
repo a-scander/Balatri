@@ -16,4 +16,8 @@ public record Card(Rank rank, Suit suit) {
     public String toString() {
         return rank + " of " + suit;
     }
+
+    public String toStringSmall() {
+        return "" + rank.getValue() + suit.name().charAt(0);
+    }
 }
