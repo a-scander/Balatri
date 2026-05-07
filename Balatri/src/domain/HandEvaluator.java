@@ -2,8 +2,6 @@ package domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +26,10 @@ public class HandEvaluator {
         return HandType.HIGH_CARD;
     }
 //Couleur
-    private static boolean checkFlush(List<Card> cards) {
-        return CardUtils.groupBySuit(cards).keySet().size() == 1;
+    private static boolean checkFlush(List<Card> cards/*, FlushConfig config */) {
+        return CardUtils.groupBySuit(cards).values().stream()
+            .anyMatch(list -> list.size() == 5/*config.requiredCardsNumber */);
+
         /*
         Suit first = cards.get(0).suit();
         
@@ -132,6 +132,6 @@ public class HandEvaluator {
     
 //Paire
     private static boolean checkPair(List<Card> cards) {
-        return CardUtils.getRankCounts(cards).containsValue(2);
+        return CardUtils.getRankCounts(cards).containsValue(2L);
     }
 }
