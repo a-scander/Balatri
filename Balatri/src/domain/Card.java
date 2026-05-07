@@ -1,7 +1,16 @@
 package domain;
 
-public record Card(Rank rank, Suit suit) {
+import java.util.Objects;
 
+public record Card(Rank rank, Suit suit) {
+    public Card{
+        Objects.requireNonNull(rank);
+        Objects.requireNonNull(suit);
+    }
+
+    public boolean isAce(){
+        return rank == Rank.ACE;
+    }
 
     @Override
     public String toString() {

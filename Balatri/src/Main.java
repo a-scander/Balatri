@@ -14,10 +14,7 @@ public class Main {
 			deck.discardCards(hand.discardHand());
 			IO.println(hand.getCards());
 			
-			IO.println("pioche : " + deck.getPickaxeCards());
+			IO.println("pioche : " + deck.deckCards());
 			IO.println("defausse : " + deck.getDiscardCards());
-
-
 	}
-
 }

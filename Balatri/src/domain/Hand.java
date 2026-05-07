@@ -1,7 +1,10 @@
 package domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Hand {
     private List<Card> cards;
@@ -30,7 +33,18 @@ public class Hand {
 		return cards;
 	}
 
-    
+    public List<Card> sortHand() {
+        var sortedHand = new ArrayList<>(cards);
+        sortedHand.sort(Comparator.comparingInt(card -> card.rank().getValue()));
+        return Collections.unmodifiableList(sortedHand);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + sortHand().stream()
+                .map(Card::toString)
+                .collect(Collectors.joining(", ")) + "]";
+    }
     
     
 }
