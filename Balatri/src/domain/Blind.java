@@ -1,5 +1,6 @@
 package domain;
 
+/*TODO: faire une classe */
 public enum Blind {
     SMALL_BLIND  ("Small Blind",   300),
     BIG_BLIND    ("Big Blind",     600),
