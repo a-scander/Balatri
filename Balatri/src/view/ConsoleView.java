@@ -24,7 +24,7 @@ public class ConsoleView implements View {
     public void onEvent(AppEvent event, GameState state) {
         switch(event) {
             case GameEvent ge -> processEvent(ge, state);
-            case ZenEvent ze -> {}
+            case ZenEvent _ -> {}
         }
     }
 

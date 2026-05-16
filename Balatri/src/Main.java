@@ -4,10 +4,6 @@ import model.GameState;
 import view.ConsoleView;
 import view.View;
 
-import java.awt.Color;
-
-import com.github.forax.zen.Application;
-
 import controller.GameController;
 import view.zen6.Zen6View;
 

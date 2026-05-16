@@ -1,21 +1,16 @@
 package view.zen6;
 
-import domain.Card;
 import event.AppEvent;
 import event.GameEvent;
 import event.PlayerAction;
 import event.ZenEvent;
 import model.GameState;
 import view.View;
-import view.ui.CardUI;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Collections;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.util.*;
 
 import com.github.forax.zen.Application;
 import com.github.forax.zen.ApplicationContext;
@@ -145,7 +140,7 @@ public class Zen6View implements View {
                 switch (clickedObject) {
                     case UICard uiCard -> controller.onAction(PlayerAction.CARD_CHOSE, uiCard.getCard());
                     case Button button -> button.callBack(state);
-                    case UIRectangle uiRect -> {}
+                    case UIRectangle _ -> {}
                     case null -> {}
                 }
                 redraw();
