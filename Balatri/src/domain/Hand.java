@@ -49,6 +49,10 @@ public class Hand {
         return Collections.unmodifiableList(sortedHand);
     }
 
+    public int remainingSpace(){
+        return maxSize - cardsHand.size();
+    }
+
     @Override
     public String toString() {
         return "[" + sortHand().stream()

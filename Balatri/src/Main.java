@@ -3,16 +3,13 @@
 import model.GameState;
 import view.ConsoleView;
 import view.View;
+
+import java.awt.Color;
+
+import com.github.forax.zen.Application;
+
 import controller.GameController;
-// import java.awt.Color;
-// import java.awt.Graphics2D;
-// import com.github.forax.zen.Application;
-// import static com.github.forax.zen.Application.run;
-// import com.github.forax.zen.Event;
-// import com.github.forax.zen.ApplicationContext;
-
-
-
+import view.zen6.Zen6View;
 
 public class Main {
 
@@ -34,23 +31,14 @@ public class Main {
 		GameState state     = new GameState();
 		GameController ctrl = new GameController(state);
 
-		View console = new ConsoleView(ctrl);
+		View view;
 		// Link the view to the controller
-		ctrl.setView(console);      
-		//launch the main game loop
-        ctrl.startGame();
+		if(args.length > 0 && args[0].equals("console")) {
+			view = new ConsoleView(ctrl);
+		} else {
+			view = Zen6View.initGameGraphics(state, ctrl);
+		}
+		ctrl.setView(view);
+		view.launch(ctrl);
 	}
-	// public static void render(ApplicationContext context){
-	// 	while (true) {
-	// 		Event event;
-	// 		while ((event = context.pollEvent()) != null) {
-	// 			System.out.println(event);
-	// 		}
-
-	// 		context.renderFrame((Graphics2D g) -> {
-	// 		g.setColor(Color.RED);
-	// 		g.fillRect(100, 100, 200, 200);
-	// 		});
-	// 	}
-	// }
 }

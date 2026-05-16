@@ -1,6 +1,6 @@
 package event;
 
-public enum GameEvent {
+public enum GameEvent implements AppEvent {
     HAND_DRAWN,
     SELECTION_HAND,
     CARD_SELECTED,

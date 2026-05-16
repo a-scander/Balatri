@@ -7,4 +7,7 @@ run: build
 
 build:
 	mkdir -p $(BIN)
-	javac -d $(BIN) -cp "$(JAR):$(SRC)" Main.java domain/*.java
+	javac -d $(BIN) -cp "$(JAR):$(SRC)" $(shell find . -name '*.java')
+
+clean:
+	rm -rf $(BIN)

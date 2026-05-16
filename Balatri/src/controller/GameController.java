@@ -1,21 +1,36 @@
 package controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.github.forax.zen.ApplicationContext;
+import com.github.forax.zen.Event;
+import com.github.forax.zen.KeyboardEvent;
+import com.github.forax.zen.PointerEvent;
+
 import domain.*;
 import event.*;
 import model.GameState;
-
 import view.View;
+import view.zen6.Button;
+import view.zen6.Point;
+import view.zen6.UICard;
+import view.zen6.UIObject;
+import view.zen6.Zen6View;
 
 
 public class GameController {
 
-
     private final GameState state;
     private View view;
+    private final Object stateLock = new Object();
 
     public GameController(GameState state) {
         this.state = state;
-        view = null;
+    }
+
+    public GameState getState(){
+        return state;
     }
 
     // Assigns a view to the controller to establish the MVC communication.
@@ -24,11 +39,11 @@ public class GameController {
     }
 
     // Sends an event to the view to trigger a UI refresh with the current state.
-    private void emit(GameEvent event) {
-        this.view.onEvent(event, state);
+    private void emit(AppEvent event) {
+        view.onEvent(event, state);
     }
 
-    // Starts the main game loop 
+    // Starts the main game loop.
     public void startGame() {
         while (true) {
 
@@ -69,17 +84,16 @@ public class GameController {
     // Handles user interactions sent from the view based on the action type.
     public void onAction(PlayerAction action, Object data) {
         switch(action) {
-            // Case when a player clicks/selects an individual card.
             case CARD_CHOSE -> onCardChoose((Card) data);
-            
-            // Case when the player decides to play their selected poker hand.
             case PLAY_HAND -> playHandSelected();
-            
-            // Case when the player decides to discard the selected cards.
-            case DISCARD ->  discardHandSelected();      
+            case DISCARD -> discardHandSelected();
+            case QUIT_GAME -> {
+                emit(GameEvent.GAME_OVER);
+                System.exit(0);
+            }
         }
     }
-    
+       
     // Toggles the selection status of a card: deselects it if already chosen, or selects it if under the 5-card limit.
     private void onCardChoose(Card card) {
         if (state.getSelectedCards().contains(card)) {
@@ -92,12 +106,17 @@ public class GameController {
 
     // Evaluates the scoring of the selected hand, updates game state values, and discards used cards.
     private void playHandSelected() {
-       
+        if(state.getSelectedCards().isEmpty()) {
+            IO.println("No cards selected to play.");
+            return;
+        }
         HandType handType = HandEvaluator.evaluate(state.getSelectedCards());
         int score = handType.getBaseChips() * handType.getBaseMult();
         state.addScore(score);
+        IO.println("Hand played: " + handType + " for " + score + " points. Total score: " + state.getScore());
         state.decrementHands();
         state.discardFullHand();
+        state.drawCards(state.getHand().remainingSpace());
         emit(GameEvent.HAND_PLAYED);
     }
     

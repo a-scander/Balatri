@@ -2,8 +2,11 @@ package view;
 
 import domain.Card;
 import event.GameEvent;
+import event.AppEvent;
 import event.PlayerAction;
+import event.ZenEvent;
 import model.GameState;
+
 import java.util.Scanner;
 import controller.GameController;
 
@@ -18,7 +21,14 @@ public class ConsoleView implements View {
 
     // Handles incoming game engine events and routes them to specific UI display methods.
     @Override
-    public void onEvent(GameEvent event, GameState state) {
+    public void onEvent(AppEvent event, GameState state) {
+        switch(event) {
+            case GameEvent ge -> processEvent(ge, state);
+            case ZenEvent ze -> {}
+        }
+    }
+
+    private void processEvent(GameEvent event, GameState state) {
         switch(event) {
             case HAND_DRAWN       -> onHandDrawn(state);
             case SELECTION_HAND   -> askPlayer(state);
@@ -31,6 +41,10 @@ public class ConsoleView implements View {
         }
     }
 
+    @Override
+    public void launch(GameController controller) {
+        controller.startGame();
+    }
 
     private void displaySeparator() {
         System.out.println("\n-------------------------------------------------");
