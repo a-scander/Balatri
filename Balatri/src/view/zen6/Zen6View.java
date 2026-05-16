@@ -62,7 +62,7 @@ public class Zen6View implements View {
     }
 
     private void drawFrame(Graphics2D graphics) {
-        IO.println(uiObjects.stream().filter(this::isUICard).map(obj -> ((UICard) obj).getCard()).toList());
+        //IO.println(uiObjects.stream().filter(this::isUICard).map(obj -> ((UICard) obj).getCard()).toList());
         var clip = graphics.getClipBounds();
         if (clip != null) {
             graphics.setColor(Color.WHITE);
@@ -161,6 +161,7 @@ public class Zen6View implements View {
 
     public void BalatriGame(ApplicationContext context, GameController controller) {
         this.context = context;
+        redraw();
         while (true) {
             var event = context.pollOrWaitEvent(10);
             ZenEvent gameEvent = new ZenEvent(event);
