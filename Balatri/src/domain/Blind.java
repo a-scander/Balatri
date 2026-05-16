@@ -2,11 +2,11 @@ package domain;
 
 /*TODO: faire une classe */
 public enum Blind {
-    SMALL_BLIND  ("Small Blind",   300),
-    BIG_BLIND    ("Big Blind",     600),
-    BOSS_BLIND   ("Boss Blind",   1200),
-    MEGA_BLIND   ("Mega Blind",   2500),
-    ULTRA_BLIND  ("Ultra Blind",  5000);
+    SMALL_BLIND  ("Small Blind",   30),//petit score pour les tests
+    BIG_BLIND    ("Big Blind",     60);//petit score pour les tests
+    // BOSS_BLIND   ("Boss Blind",   1200),
+    // MEGA_BLIND   ("Mega Blind",   2500),
+    // ULTRA_BLIND  ("Ultra Blind",  5000);
 
     private final String name;
     private final int targetScore;
