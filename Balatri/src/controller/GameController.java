@@ -1,29 +1,15 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.github.forax.zen.ApplicationContext;
-import com.github.forax.zen.Event;
-import com.github.forax.zen.KeyboardEvent;
-import com.github.forax.zen.PointerEvent;
-
 import domain.*;
 import event.*;
 import model.GameState;
 import view.View;
-import view.zen6.Button;
-import view.zen6.Point;
-import view.zen6.UICard;
-import view.zen6.UIObject;
-import view.zen6.Zen6View;
 
 
 public class GameController {
 
     private final GameState state;
     private View view;
-    private final Object stateLock = new Object();
 
     public GameController(GameState state) {
         this.state = state;
