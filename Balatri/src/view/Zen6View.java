@@ -68,7 +68,9 @@ public final class Zen6View implements View {
         }
     }
 
-    private void redraw() {context.renderFrame(this::drawFrame);}
+    private void redraw() {
+        if(this.context == null)return;
+        context.renderFrame(this::drawFrame);}
 
     public void addUIObject(UIObject obj) {uiObjects.add(obj);}
     
