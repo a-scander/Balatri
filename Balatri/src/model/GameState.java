@@ -6,6 +6,7 @@ import java.util.Map;
 
 import domain.*;
 import event.OutputEvent.BlindBeaten;
+import event.OutputEvent.BlindOnGoing;
 import event.OutputEvent.GameEvent;
 import event.OutputEvent.GameOver;
 import event.OutputEvent.GameWon;
@@ -78,7 +79,8 @@ public class GameState {
 		var discardedCards = new ArrayList<>(currentBlind.getSelectedCards());
 		currentBlind.playHand(score);
 
-		//DEBUG: IO.println("Hand played: " + handType + " for " + score + " points. Total score: " + currentBlind.getScore());
+		//DEBUG: 
+		IO.println("Hand played: " + handType + " for " + score + " points. Total score: " + currentBlind.getScore());
 		return new HandPlayed(score, handType, discardedCards, currentBlind.drawHand());
 	}
 
@@ -86,15 +88,17 @@ public class GameState {
 		if(currentBlind.blindIsLost()) {
 			return new GameOver();
 		}
-		
-		if (blindIndex < blinds.length - 1) {
-			blindIndex++;
-			currentBlind = blinds[blindIndex];
-			return new BlindBeaten();
-		} else {
-			return new GameWon();
+		if(currentBlind.getScore() < currentBlind.getTargetScore()) {
+			return new BlindOnGoing();
 		}
+		if (blindIndex < blinds.length - 1) {
+				blindIndex++;
+				currentBlind = blinds[blindIndex];
+				return new BlindBeaten();
+		}
+		return new GameWon();
 	}
+
 
     public GameEvent onDiscard() {
         currentBlind.discard();

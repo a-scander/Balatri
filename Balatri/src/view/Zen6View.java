@@ -1,11 +1,11 @@
-package view.zen6;
+package view;
 
 import event.InputEvent.*;
 import event.OutputEvent.*;
 import model.GameState;
-import view.View;
+import view.zen6.*;
+
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -19,7 +19,7 @@ import com.github.forax.zen.PointerEvent;
 import controller.GameController;
 import domain.Card;
 
-public class Zen6View implements View {
+public final class Zen6View implements View {
     private final List<UIObject> uiObjects = new ArrayList<>();
     private GameController controller;
     private ApplicationContext context;
@@ -28,8 +28,17 @@ public class Zen6View implements View {
     public static Zen6View initGameGraphics(GameState state, GameController controller) { /*TODO: make a contructor instead */
         var view = new Zen6View();
         view.controller = controller;
-        view.HandContainer = new UIHandContainer(50, 300, 800, 200, 0);
+        view.HandContainer = new UIHandContainer(20, 200, 1000, 200, 0);
         view.addUIObject(view.HandContainer);
+        var playButton = new Button(
+            (ctrl, gs) -> ctrl.onAction(PlayerAction.PLAY_HAND, null),
+            20,
+            420,
+            200,
+            50,
+            1
+        );
+        view.addUIObject(playButton);
         return view;
     }
 
@@ -65,7 +74,6 @@ public class Zen6View implements View {
     }
 
     private void drawFrame(Graphics2D graphics) {
-        //IO.println(uiObjects.stream().filter(this::isUICard).map(obj -> ((UICard) obj).getCard()).toList());
         var clip = graphics.getClipBounds();
         if (clip != null) {
             graphics.setColor(Color.WHITE);
@@ -107,22 +115,31 @@ public class Zen6View implements View {
         for (UIObject obj : uiObjects) {
             if (!obj.contains(location)) continue;
 
-            if (obj instanceof UIHandContainer hc) {
-                UICard clicked = hc.getClickedCard(location);
-                if (clicked != null) {
-                    if (clicked.zDepth() > bestZ) {
-                        best = clicked;
-                        bestZ = clicked.zDepth();
+            switch(obj){
+                case UICard card -> {
+                    if (card.zDepth() > bestZ) {
+                        best = card;
+                        bestZ = card.zDepth();
                     }
                 }
-                if (obj.zDepth() > bestZ) {
-                    best = obj;
-                    bestZ = obj.zDepth();
+                case Button button -> {
+                    if (button.zDepth() > bestZ) {
+                        best = button;
+                        bestZ = button.zDepth();
+                    }
                 }
-            } else {
-                if (obj.zDepth() > bestZ) {
-                    best = obj;
-                    bestZ = obj.zDepth();
+                case UIRectangle _ -> {}
+                case UIHandContainer c -> {
+                    if (c.zDepth() > bestZ) {
+                        best = c;
+                        bestZ = c.zDepth();
+                    }
+                    for (UICard card : c.getCards()) {
+                        if (card.contains(location) && card.zDepth() > bestZ) {
+                            best = card;
+                            bestZ = card.zDepth();
+                        }
+                    }
                 }
             }
         }
@@ -138,12 +155,15 @@ public class Zen6View implements View {
             case CardSelected cs -> {selectCards(cs.changedCards(), true);}
             case HandDrawn hd -> {addCards(hd.changedCards());}
             case HandDiscarded hd -> {removeCards(hd.changedCards());} 
-            case BlindBeaten _, GameOver _, GameWon _ -> {}
+            case BlindBeaten _, BlindOnGoing _, GameOver _, GameWon _ -> {}
         }
         redraw();
     }
 
     public void processEvent(Event event, GameState state) {
+        // Process any queued actions from non-GUI threads (e.g., console)
+        controller.processQueuedActions();
+        
         switch (event) {
             case null:
                 break;
@@ -157,16 +177,16 @@ public class Zen6View implements View {
                     redraw();
 
                 }
-
                 break;
+
             case PointerEvent pe:
                 if (pe.action() != PointerEvent.Action.POINTER_DOWN) {return;}
                 var location = pe.location();
                 UIObject clickedObject = getClickedObject(new Point(location.x(), location.y()));
-                System.out.println("PointerEvent at " + location.x() + "," + location.y() + " -> clicked: " + clickedObject);
+                //IO.println("PointerEvent at " + location.x() + "," + location.y() + " -> clicked: " + clickedObject);
                 switch (clickedObject) {
                     case UICard uiCard -> controller.onAction(PlayerAction.CARD_CHOSE, uiCard.getCard());
-                    case Button button -> button.callBack(state);
+                    case Button button -> button.onClick(controller, state);
                     case UIRectangle _, UIHandContainer _ -> {}
                     case null -> {}
                 }

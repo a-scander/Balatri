@@ -1,11 +1,12 @@
 package view.zen6;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import domain.Card;
-import domain.CardUtils;
 
 public final class UIHandContainer implements UIObject {
     private int x;
@@ -21,7 +22,6 @@ public final class UIHandContainer implements UIObject {
         this.width = width;
         this.height = height;
         this.zDepth = zDepth;
-
     }
 
     @Override
@@ -34,9 +34,18 @@ public final class UIHandContainer implements UIObject {
 
     @Override
     public void draw(Graphics2D graphics) {
+        // Draw container background
+        graphics.setColor(Color.GRAY);
+        graphics.fillRect(x, y, width, height);
         for(var card: cards){
             card.draw(graphics);
         }
+    }
+
+    private void sortCards() {
+        cards.sort(Comparator
+            .comparingInt((UICard c) -> c.getCard().rank().getValue())
+            .thenComparing(c -> c.getCard().suit().ordinal()));
     }
 
     public void addCard(Card card){
@@ -59,11 +68,12 @@ public final class UIHandContainer implements UIObject {
     }
 
     public void recomputeCardsCoordinates(){
+        sortCards();
         for(int i = 0; i < cards.size(); i++){
             UICard card = cards.get(i);
             int x = this.x + 10 + i * 110;
-            int y = this.y + 10;
-            cards.set(i, new UICard(card.getCard(), x, y, 100, 150, zDepth + 1, false));
+            int y = this.y + 30;
+            cards.set(i, new UICard(card.getCard(), x, y, 100, 150, zDepth + 1, card.isSelected()));
         }
     }
 
@@ -74,7 +84,8 @@ public final class UIHandContainer implements UIObject {
                 UICard uiCard = cards.get(i);
                 if(uiCard.getCard().equals(card)){
                     found = true;
-                    cards.set(i, new UICard(uiCard.getCard(), uiCard.x(), uiCard.y(), uiCard.width(), uiCard.height(), uiCard.zDepth(), isSelected));
+                    int newY = uiCard.y() + (isSelected ? -20 : 20);
+                    cards.set(i, new UICard(uiCard.getCard(), uiCard.x(), newY, uiCard.width(), uiCard.height(), uiCard.zDepth(), isSelected));
                 }
             }
             if(!found){
@@ -88,7 +99,7 @@ public final class UIHandContainer implements UIObject {
     }
 
     public java.util.List<UICard> getCards() {
-        return new java.util.ArrayList<>(cards);
+        return new ArrayList<>(cards);
     }
 
     public UICard getClickedCard(Point p) {

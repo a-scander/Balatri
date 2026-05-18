@@ -1,13 +1,14 @@
 package view.zen6;
 
-import java.util.function.Function;
-import model.GameState;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import model.GameState;
 
-public record Button(Function<GameState, Void> f, int x, int y, int width, int height, int zDepth) implements UIObject {
-    public void callBack(GameState state){
-        f.apply(state);
+import controller.GameController;
+
+public record Button(java.util.function.BiConsumer<GameController, GameState> action, int x, int y, int width, int height, int zDepth) implements UIObject {
+    public void onClick(GameController controller, GameState state){
+        action.accept(controller, state);
     }
     
     @Override

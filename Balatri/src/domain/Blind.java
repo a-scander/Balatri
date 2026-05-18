@@ -41,6 +41,7 @@ public class Blind {
         this.discard = new ArrayList<>();
     }
 
+    public String getName() {return name;}
     public List<Card> getSelectedCards() {return selectedCards;}
     public int getScore() {return score;}
     public int getHandsCurrent() {return handsCurrent;}

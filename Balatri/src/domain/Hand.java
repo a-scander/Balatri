@@ -15,6 +15,10 @@ public class Hand {
         this.maxSize = maxSize;
     }
 
+    public int getMaxSize() {
+        return maxSize;
+    }
+
     // Adds a list of cards (drawn from the deck) to the hand if there is enough space.
     public boolean addCard(List<Card> deck) {
 

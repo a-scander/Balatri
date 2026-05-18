@@ -15,16 +15,18 @@ Tasks:
 - Définir des blinds cohérents(valeurs actuelles = test) -> blindes infinis
 - Etats de jeu (Menu de démarrage/En Jeu, Shop(Entre Blind)/En Blind/En pause)
 
+GameController:
+startBlind: this is only a test, should be replaced by the actual blind initialization logic
+onAction: blind changing logic and shop
+onAction: calculate money won and apply jokers that execute on last hand
 
-L'IA
-startGame() uses a tight while (true) loop -> la boucle while arrête l'execution mauvais MVC
+GameState.java:
+Line 57: if size is good select else message
+Line 70: appliquer les jokers qui s'executent avant
+Line 71: return a handresult with the handtype and the scoring cards
+Line 76: routine de scoring des cards et des jokers qui s'executent pendant
+Line 77: appliquer les jokers qui s'executent apres
+Line 109: saving the current state and game
 
-In a GUI-based MVC design, control should be event-driven rather than a blocking loop.
-The view should drive user actions and the controller should react, instead of the controller continuously looping.
-
-GameState exposes getSelectedCards(), getHand(), getDeck(), etc. -> La logic de certaines fonctions devrait se trouver dans GameState et se faire appeler dans Controller
-Business logic partly in controller -> L'utilisation de HandEvaluator est uniquement à faire dans gameState
-
-
-emit(AppEvent event, state) couples view updates to controller -> emit fonctionne correctement mais pourrait être améliorer en n'envoyant uniquement ce qui à changer dans le state plutot que le state en entier  (Fait rmoved AppEvent entirely)
-It works, but a cleaner MVC design would let the view observe model changes or receive more focused events rather than being passed the whole state every time.
+Zen6View.java:
+Line 28: make a constructor instead

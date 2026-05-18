@@ -1,11 +1,8 @@
 
 
 import model.GameState;
-import view.ConsoleView;
-import view.View;
-
+import view.*;
 import controller.GameController;
-import view.zen6.Zen6View;
 
 public class Main {
 
@@ -30,11 +27,12 @@ public class Main {
 		View view;
 		// Link the view to the controller
 		if(args.length > 0 && args[0].equals("console")) {
-			view = new ConsoleView(ctrl);
-		} else {
+			ctrl.addView(new ConsoleView(ctrl));
+		} else{
 			view = Zen6View.initGameGraphics(state, ctrl);
+			ctrl.addView(view);
 		}
-		ctrl.setView(view);
+		ctrl.addView(new ConsoleView(ctrl));
 		ctrl.startGame();
 		ctrl.launch();
 	}
