@@ -35,6 +35,7 @@ public class Main {
 			view = Zen6View.initGameGraphics(state, ctrl);
 		}
 		ctrl.setView(view);
-		view.launch(ctrl);
+		ctrl.startGame();
+		ctrl.launch();
 	}
 }

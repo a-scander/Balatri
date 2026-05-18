@@ -42,6 +42,11 @@ public class Hand {
 	public List<Card> getCards() {
 		return cardsHand;
 	}
+
+    public void setCards(List<Card> newCards) {
+        this.cardsHand = new ArrayList<>(newCards);
+    }
+    
     // Creates a new sorted copy of the hand
     public List<Card> sortHand() {
         var sortedHand = new ArrayList<>(cardsHand);

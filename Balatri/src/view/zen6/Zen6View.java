@@ -1,9 +1,7 @@
 package view.zen6;
 
-import event.AppEvent;
-import event.GameEvent;
-import event.PlayerAction;
-import event.ZenEvent;
+import event.InputEvent.*;
+import event.OutputEvent.*;
 import model.GameState;
 import view.View;
 import java.util.ArrayList;
@@ -19,15 +17,19 @@ import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.PointerEvent;
 
 import controller.GameController;
+import domain.Card;
 
 public class Zen6View implements View {
     private final List<UIObject> uiObjects = new ArrayList<>();
     private GameController controller;
     private ApplicationContext context;
+    private UIHandContainer HandContainer;
 
-    public static Zen6View initGameGraphics(GameState state, GameController controller) {
+    public static Zen6View initGameGraphics(GameState state, GameController controller) { /*TODO: make a contructor instead */
         var view = new Zen6View();
         view.controller = controller;
+        view.HandContainer = new UIHandContainer(50, 300, 800, 200, 0);
+        view.addUIObject(view.HandContainer);
         return view;
     }
 
@@ -38,21 +40,27 @@ public class Zen6View implements View {
         };
     }
 
-    private void refreshHandCards(GameState state) {
-        var cards = state.getHand().getCards();
-        var selectedCards = state.getSelectedCards();
+    private void selectCards(List<Card> changedCards, boolean isSelected){
+        HandContainer.selectCards(changedCards, isSelected);
+    }
 
-        // Rebuild the hand UI cards so positions and z-depth stay consistent.
-        uiObjects.removeIf(this::isUICard);
+    private void addCards(List<Card> changedCards) {
+        changedCards.forEach(HandContainer::addCard);
+        HandContainer.recomputeCardsCoordinates();
+        redraw();
+    }
 
-        for (int index = 0; index < cards.size(); index++) {
-            var card = cards.get(index);
-            int x = 50 + index * 110;
-            int y = selectedCards.contains(card) ? 420 : 400;
-            UICard uiCard = new UICard(card, x, y, 100, 150, index);
-            uiObjects.add(uiCard);
-        }
+    private void removeCards(List<Card> removedCards){
+        removedCards.forEach(HandContainer::removeCard);
+        HandContainer.recomputeCardsCoordinates();
+        redraw();
+    }
 
+    private void refreshHand(GameState state) {
+        HandContainer.removeAllCards();
+        state.getCurrentBlind().getHand().getCards().forEach(HandContainer::addCard);
+        state.getCurrentBlind().getSelectedCards().forEach(HandContainer::addCard);
+        HandContainer.recomputeCardsCoordinates();
         redraw();
     }
 
@@ -92,29 +100,47 @@ public class Zen6View implements View {
         return new ArrayList<>(uiObjects);
     }
     
-    public UIObject getClickedObject(Point location) {
-        return uiObjects.stream()
-            .filter(obj -> obj.contains(location))
-            .max(Comparator.comparingInt(UIObject::zDepth))
-            .orElse(null);
+    public UIObject getClickedObject(Point location) {//to change
+        UIObject best = null;
+        int bestZ = Integer.MIN_VALUE;
+
+        for (UIObject obj : uiObjects) {
+            if (!obj.contains(location)) continue;
+
+            if (obj instanceof UIHandContainer hc) {
+                UICard clicked = hc.getClickedCard(location);
+                if (clicked != null) {
+                    if (clicked.zDepth() > bestZ) {
+                        best = clicked;
+                        bestZ = clicked.zDepth();
+                    }
+                }
+                if (obj.zDepth() > bestZ) {
+                    best = obj;
+                    bestZ = obj.zDepth();
+                }
+            } else {
+                if (obj.zDepth() > bestZ) {
+                    best = obj;
+                    bestZ = obj.zDepth();
+                }
+            }
+        }
+
+        return best;
     }
 
     @Override
-    public void onEvent(AppEvent event, GameState state) {
-        switch(event){
-            case ZenEvent ze -> processEvent(ze.event(), state);
-            case GameEvent ge -> processGameEvent(ge, state);
-        }
-    }
-
-    private void processGameEvent(GameEvent event, GameState state) {
+    public void onEvent(GameEvent event, GameState state) {
         switch (event) {
-            case HAND_DRAWN, HAND_PLAYED -> refreshHandCards(state);
-            case DISCARD_SELECTED, CARD_SELECTED, SELECTION_HAND -> refreshHandCards(state);
-            case BLIND_BEATEN, GAME_OVER, GAME_WON -> {}
+            case HandPlayed hp -> refreshHand(state);
+            case CardUnselected us -> {selectCards(us.changedCards(), false);}
+            case CardSelected cs -> {selectCards(cs.changedCards(), true);}
+            case HandDrawn hd -> {addCards(hd.changedCards());}
+            case HandDiscarded hd -> {removeCards(hd.changedCards());} 
+            case BlindBeaten _, GameOver _, GameWon _ -> {}
         }
         redraw();
-
     }
 
     public void processEvent(Event event, GameState state) {
@@ -137,10 +163,11 @@ public class Zen6View implements View {
                 if (pe.action() != PointerEvent.Action.POINTER_DOWN) {return;}
                 var location = pe.location();
                 UIObject clickedObject = getClickedObject(new Point(location.x(), location.y()));
+                System.out.println("PointerEvent at " + location.x() + "," + location.y() + " -> clicked: " + clickedObject);
                 switch (clickedObject) {
                     case UICard uiCard -> controller.onAction(PlayerAction.CARD_CHOSE, uiCard.getCard());
                     case Button button -> button.callBack(state);
-                    case UIRectangle _ -> {}
+                    case UIRectangle _, UIHandContainer _ -> {}
                     case null -> {}
                 }
                 redraw();
@@ -150,17 +177,13 @@ public class Zen6View implements View {
 
     @Override
     public void launch(GameController controller) {
-        controller.drawHand();
-        Application.run(Color.WHITE, context -> BalatriGame(context, controller));
-    }
-
-    public void BalatriGame(ApplicationContext context, GameController controller) {
-        this.context = context;
-        redraw();
-        while (true) {
-            var event = context.pollOrWaitEvent(10);
-            ZenEvent gameEvent = new ZenEvent(event);
-            onEvent(gameEvent, controller.getState());
-        }
+        Application.run(Color.WHITE, context -> {
+            this.context = context;
+            redraw();
+            while (true) {
+                var event = context.pollOrWaitEvent(10);
+                processEvent(event, controller.getState());
+            }
+        });
     }
 }

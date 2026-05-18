@@ -1,10 +1,12 @@
 package controller;
 
 import domain.*;
-import event.*;
+import event.InputEvent.*;
+import event.OutputEvent.*;
+import event.OutputEvent.GameEvent;
 import model.GameState;
+import model.GameState.Phase;
 import view.View;
-
 
 public class GameController {
 
@@ -15,117 +17,87 @@ public class GameController {
         this.state = state;
     }
 
-    public GameState getState(){
+    public GameState getState() {
         return state;
     }
 
-    // Assigns a view to the controller to establish the MVC communication.
     public void setView(View view) {
         this.view = view;
     }
 
-    // Sends an event to the view to trigger a UI refresh with the current state.
-    private void emit(AppEvent event) {
-        view.onEvent(event, state);
+    public void launch() {
+        if (view == null) {
+            throw new IllegalStateException("View must be assigned before launching the game.");
+        }
+        view.launch(this);
+        
     }
 
-    // Starts the main game loop.
+    private void emit(GameEvent event) {
+        if (view != null) {
+            view.onEvent(event, state);
+        }
+    }
+
     public void startGame() {
-        while (true) {
-
-            drawHand();
-            startSelection(); 
-    
-            // Check if the final boss blind is beaten and the entire game is won.
-            if (winGame()) {
-                emit(GameEvent.GAME_WON);
-                break;
-            }
-            
-            // Check if the player has run out of hands without beating the blind score.
-            if (loseGame()) {
-                emit(GameEvent.GAME_OVER);
-                break;
-            }
-            
-            // Check if the current score is enough to clear the current round/blind.
-            if (winBlind()) {
-                emit(GameEvent.BLIND_BEATEN);
-                state.nextBlind();
-            }
+        if (view == null) {
+            throw new IllegalStateException("View must be assigned before starting the game.");
         }
+        emit(state.drawHand());
+        state.setPhase(GameState.Phase.MAIN_SCREEN);
     }
 
-    // Refills the player's hand up to 8 cards and notifies the view.
-    public void drawHand() {
-        state.drawCards(8);
-        emit(GameEvent.HAND_DRAWN);
+    private void initializeGame() {
+        /*once the user request playing a game */
+        /*initialize the blinds */
+        state.setPhase(GameState.Phase.BLIND_SELECTION);
     }
 
-    // Triggers the event indicating the player is currently selecting cards.
-    private void startSelection() {
-        emit(GameEvent.SELECTION_HAND);
+    private void startBlind() {
+        /*once the user has selected the blind starts it */
+        /*Should initialize the blind */
+        //TODO: this is only a test, should be replaced by the actual blind initialization logic
+        emit(state.drawHand());
+        state.setPhase(GameState.Phase.IN_BLIND);
+
+
+        //state.setPhase(GameState.Phase.IN_BLIND);
     }
 
-    // Handles user interactions sent from the view based on the action type.
+    private void finishGame() {
+    }
+
     public void onAction(PlayerAction action, Object data) {
-        switch(action) {
-            case CARD_CHOSE -> onCardChoose((Card) data);
-            case PLAY_HAND -> playHandSelected();
-            case DISCARD -> discardHandSelected();
-            case QUIT_GAME -> {
-                emit(GameEvent.GAME_OVER);
-                System.exit(0);
+        switch (action) {
+            case CARD_CHOSE -> {emit(state.selectCard((Card) data));}
+            case PLAY_HAND -> {
+                GameEvent playResult = state.onPlayHand();
+                IO.println("Play hand result: " + playResult);
+                if(playResult == null){
+                    IO.println("No cards selected, cannot play hand.");
+                    return;
+                }
+                emit(playResult);
+                GameEvent outcome = state.checkOutcome();
+                switch(outcome){
+                    case BlindBeaten _ -> state.setPhase(Phase.BLIND_SELECTION);
+                    case GameOver _ -> state.setPhase(Phase.GAME_OVER);
+                    case GameWon _ -> state.setPhase(Phase.GAME_OVER);
+                    default -> {}
+                    //TODO : calculate money won and apply jokers that execute on last hand
+                }
+                emit(outcome);
             }
+            
+            case DISCARD -> emit(state.onDiscard());
+            case QUIT_GAME -> emit(state.onQuitGame());
+            /*case all phase changes
+            * case START_GAME -> initializeGame();
+            * case BLIND_SELECTED -> startBlind();
+            * case SELECT_BLIND -> startBlind();
+            */
         }
-    }
-       
-    // Toggles the selection status of a card: deselects it if already chosen, or selects it if under the 5-card limit.
-    private void onCardChoose(Card card) {
-        if (state.getSelectedCards().contains(card)) {
-            state.removeSelectedCard(card);
-        } else if (state.getSelectedCards().size() < 5) {
-            state.addSelectedCard(card);
-        }
-        emit(GameEvent.CARD_SELECTED);
     }
 
-    // Evaluates the scoring of the selected hand, updates game state values, and discards used cards.
-    private void playHandSelected() {
-        if(state.getSelectedCards().isEmpty()) {
-            IO.println("No cards selected to play.");
-            return;
-        }
-        HandType handType = HandEvaluator.evaluate(state.getSelectedCards());
-        int score = handType.getBaseChips() * handType.getBaseMult();
-        state.addScore(score);
-        IO.println("Hand played: " + handType + " for " + score + " points. Total score: " + state.getScore());
-        state.decrementHands();
-        state.discardFullHand();
-        state.drawCards(state.getHand().remainingSpace());
-        emit(GameEvent.HAND_PLAYED);
-    }
-    
-    // Discards the currently selected cards and consumes one discard.
-    private void discardHandSelected() {
-        state.discardSelected();
-        state.decrementDiscard();
-        emit(GameEvent.DISCARD_SELECTED);
-    }
-  
-    // Verifies if the player's total score has met or exceeded the current blind target.
-    private boolean winBlind(){
-        return state.getScore() >= state.getScoreBlindCurrent();
-    }
-    
-    // Determines game victory if the player beats the final blind available in the enum list.
-    private boolean winGame() {
-        return state.getBlindIndex() >= Blind.values().length - 1 && winBlind();
-    }
-    
-    // Determines game loss if the player has 0 remaining hands and hasn't reached the required target score.
-    private boolean loseGame() {
-        return state.getHandsCurrent() == 0 && !winBlind();
-    }
     
 }

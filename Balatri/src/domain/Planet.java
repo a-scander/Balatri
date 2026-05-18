@@ -27,6 +27,15 @@ public enum Planet {
     public int getBonusChips()      { return bonusChips; }
     public int getBonusMult()       { return bonusMult;  }
 
+    public static Planet fromHandType(HandType handType) {
+        for (Planet planet : values()) {
+            if (planet.getTargetHand() == handType) {
+                return planet;
+            }
+        }
+        return null; // No planet corresponds to this hand type
+    }
+
     public static Planet getRandom() {
         Planet[] values = Planet.values();
         return values[new Random().nextInt(values.length)];

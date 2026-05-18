@@ -1,10 +1,13 @@
 package view;
 
 import domain.Card;
-import event.GameEvent;
-import event.AppEvent;
-import event.PlayerAction;
-import event.ZenEvent;
+import event.OutputEvent.BlindBeaten;
+import event.OutputEvent.CardSelected;
+import event.OutputEvent.GameEvent;
+import event.OutputEvent.GameOver;
+import event.OutputEvent.GameWon;
+import event.OutputEvent.HandDrawn;
+import event.OutputEvent.HandPlayed;
 import model.GameState;
 
 import java.util.Scanner;
@@ -21,24 +24,17 @@ public class ConsoleView implements View {
 
     // Handles incoming game engine events and routes them to specific UI display methods.
     @Override
-    public void onEvent(AppEvent event, GameState state) {
-        switch(event) {
-            case GameEvent ge -> processEvent(ge, state);
-            case ZenEvent _ -> {}
-        }
-    }
-
-    private void processEvent(GameEvent event, GameState state) {
-        switch(event) {
-            case HAND_DRAWN       -> onHandDrawn(state);
-            case SELECTION_HAND   -> askPlayer(state);
-            case CARD_SELECTED    -> onCardSelected(state);
-            case HAND_PLAYED      -> onHandPlayed(state);
-            case DISCARD_SELECTED -> onDiscardSelected(state);
-            case BLIND_BEATEN     -> onBlindBeaten(state);
-            case GAME_OVER        -> onGameOver();
-            case GAME_WON         -> onGameWon();
-        }
+    public void onEvent(GameEvent event, GameState state) {
+        /*switch(event) {
+            case HandDrawn _       -> onHandDrawn(state);
+            case SelectionHand _   -> askPlayer(state);
+            case CardSelected _    -> onCardSelected(state);
+            case HandPlayed _      -> onHandPlayed(state);
+            case BlindBeaten _     -> onBlindBeaten(state);
+            case GameOver _        -> onGameOver();
+            case GameWon _         -> onGameWon();
+            default -> {}
+        }*/
     }
 
     @Override
@@ -49,7 +45,7 @@ public class ConsoleView implements View {
     private void displaySeparator() {
         System.out.println("\n-------------------------------------------------");
     }
-
+    /* 
     private void displayBlindInfo(GameState state) {
         System.out.println("=== " + state.getCurrentBlind().getName() + " ===");
         System.out.println("Score : " + state.getScore() + " / " + state.getCurrentBlind().getTargetScore());
@@ -89,10 +85,6 @@ public class ConsoleView implements View {
     private void onHandPlayed(GameState state) {
         displaySeparator();
         displayBlindInfo(state);
-    }
-
-    private void onDiscardSelected(GameState state) {
-        askPlayer(state);
     }
 
     private void onBlindBeaten(GameState state) {
@@ -158,5 +150,5 @@ public class ConsoleView implements View {
         } else {
             controller.onAction(PlayerAction.CARD_CHOSE, card);
         }
-    }
+    }*/
 }

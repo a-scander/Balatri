@@ -1,75 +1,108 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 
 import domain.*;
+import event.OutputEvent.BlindBeaten;
+import event.OutputEvent.GameEvent;
+import event.OutputEvent.GameOver;
+import event.OutputEvent.GameWon;
+import event.OutputEvent.HandDiscarded;
+import event.OutputEvent.HandDrawn;
+import event.OutputEvent.HandPlayed;
 
 
 public class GameState {
-    	private final Blind[] blinds;
-	    private int blindIndex;
-	    private int score;
-	    private int handsCurrent;
-	    private final int handsPerBlind = 4;
-		private int discardCurrent;
-	    private final int discardPerBlind = 4;
-		private final Deck deck;
-	    private final Hand hand;
-	    private final List<Planet> planetsObtained;
-		private final List<Card> selectedCards;
-	    
-	    public GameState() {
-			this.blinds = Blind.values();
-			this.blindIndex = 0;
-			this.score = 0;
-			this.handsCurrent = handsPerBlind;
-			this.discardCurrent = discardPerBlind;
-			this.deck= new Deck();
-			this.hand = new Hand(8);
-			this.planetsObtained = new ArrayList<>();
-			this.selectedCards   = new ArrayList<>();
+	private final Blind[] blinds;
+	private int blindIndex;
+	private Blind currentBlind;
+	
+	private final Map<Planet, Integer> planetsObtained;
+	/*int Mooooney, List<Jokers>(A mettre dans blind peut être), List<Comsumable> (TarotCard and planet in comsumable area) */
+	private Phase phase;
 
+	
+	public GameState() {
+		this.blinds = new Blind[] {
+			new Blind("Small Blind", BlindType.SMALL_BLIND, 30),
+			new Blind("Big Blind",   BlindType.BIG_BLIND,   60) 
+			// new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
+		};
+		this.blindIndex = 0;
+		this.planetsObtained = new EnumMap<>(Planet.class);
+		this.currentBlind = blinds[blindIndex];
+		this.phase = Phase.INITIALIZE;
+	}
+
+	public enum Phase {
+		INITIALIZE,
+		MAIN_SCREEN,
+		IN_SHOP,
+		BLIND_SELECTION,
+		IN_BLIND,
+		GAME_OVER
+	}
+
+	public Blind getCurrentBlind()           { return currentBlind; }
+	public Map<Planet, Integer> getPlanetsObtained() { return planetsObtained; }
+	public int getBlindIndex()               { return blindIndex; }
+	public Phase getPhase() 				 { return phase; }
+	public void setPhase(Phase phase) 		 { this.phase = phase; }
+
+	public GameEvent selectCard(Card card) {
+
+		//TODO: if size is good select else message
+		//if (currentblind.maxselectSize < currentblind.getSelectedCards().size() || modifiers has changed mas selection size)
+		return currentBlind.selectCard(card);
+	}
+
+	public GameEvent drawHand(){
+		return new HandDrawn(currentBlind.drawHand());
+	}
+
+	public GameEvent onPlayHand() {
+		if (currentBlind.getSelectedCards().isEmpty()) {
+			return null;
 		}
+		//TODO: appliquer les jokers qui s'executent avant
+		HandType handType = HandEvaluator.evaluate(currentBlind.getSelectedCards()); // TODO : return a handresult with the handtype and the scoring cards
+		Planet planet = Planet.fromHandType(handType);
+		int nbTimesObtained = planetsObtained.getOrDefault(planet, 0);
+		int chips = handType.getBaseChips() + planet.getBonusChips() * nbTimesObtained;
+		int mult = handType.getBaseMult() + planet.getBonusMult() * nbTimesObtained;
+		//TODO : routine de scoring des cards et des jokers qui s'executent pendant
+		//TODO : appliquer les jokers qui s"executent apres
+		int score =  chips * mult;
+		var discardedCards = new ArrayList<>(currentBlind.getSelectedCards());
+		currentBlind.playHand(score);
 
-		public Blind getCurrentBlind()           { return blinds[blindIndex]; }
-		public int getScore()                    { return score; }
-		public int getHandsCurrent()             { return handsCurrent; }
-		public int getDiscardCurrent()           { return discardCurrent;}
-		public Deck getDeck()                    { return deck; }
-		public Hand getHand()                    { return hand; }
-		public List<Planet> getPlanetsObtained() { return planetsObtained; }
-		public List<Card> getSelectedCards()     { return selectedCards; }
-		public int getBlindIndex()               { return blindIndex; }
-		public int getScoreBlindCurrent() 		 {return this.getCurrentBlind().getTargetScore();}
-		public boolean isSelected(Card card)     {return selectedCards.contains(card);}
-		public void addSelectedCard(Card card)   { this.selectedCards.add(card); }
-		public void removeSelectedCard(Card card){ this.selectedCards.remove(card); }
-		public void addScore(int points)         { this.score += points; }
-		public void decrementHands()             { this.handsCurrent--; }
-		public void decrementDiscard()			 { this.discardCurrent--;}
-		public void nextBlind()                  { this.blindIndex++; score = 0; handsCurrent = handsPerBlind; discardCurrent = discardPerBlind;}
-		public void clearSelection()             { this.selectedCards.clear(); }
+		//DEBUG: IO.println("Hand played: " + handType + " for " + score + " points. Total score: " + currentBlind.getScore());
+		return new HandPlayed(score, handType, discardedCards, currentBlind.drawHand());
+	}
 
-		// Draws 'n' cards from the deck and adds them directly to the player's hand.
-		public void drawCards(int n) {
-			List<Card> drawn = getDeck().drawCards(n);
-			getHand().addCard(drawn);
-		}
-
-		// Discards the entire hand to the deck pile and clears the current selection.
-		public void discardFullHand() {
-			List<Card> all = hand.discardHandAll();
-			deck.discardCards(all);
-			clearSelection();
+	public GameEvent checkOutcome() {
+		if(currentBlind.blindIsLost()) {
+			return new GameOver();
 		}
 		
-		// Discards only the selected cards, sends them to the deck discard pile, and draws replacement cards.
-		public void discardSelected() {
-			List<Card> discarded = hand.discardHand(selectedCards);
-			deck.discardCards(discarded);
-			clearSelection();
-			drawCards(discarded.size());
+		if (blindIndex < blinds.length - 1) {
+			blindIndex++;
+			currentBlind = blinds[blindIndex];
+			return new BlindBeaten();
+		} else {
+			return new GameWon();
 		}
-		
+	}
+
+    public GameEvent onDiscard() {
+        currentBlind.discard();
+        return new HandDiscarded(currentBlind.drawHand());
+	}
+
+    public GameEvent onQuitGame() {
+        //TODO : saving the current state and game
+		return new GameOver();
+    }
 }

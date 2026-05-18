@@ -26,5 +26,5 @@ GameState exposes getSelectedCards(), getHand(), getDeck(), etc. -> La logic de 
 Business logic partly in controller -> L'utilisation de HandEvaluator est uniquement à faire dans gameState
 
 
-emit(AppEvent event, state) couples view updates to controller -> emit fonctionne correctement mais pourrait être améliorer en n'envoyant uniquement ce qui à changer dans le state plutot que le state en entier  
+emit(AppEvent event, state) couples view updates to controller -> emit fonctionne correctement mais pourrait être améliorer en n'envoyant uniquement ce qui à changer dans le state plutot que le state en entier  (Fait rmoved AppEvent entirely)
 It works, but a cleaner MVC design would let the view observe model changes or receive more focused events rather than being passed the whole state every time.

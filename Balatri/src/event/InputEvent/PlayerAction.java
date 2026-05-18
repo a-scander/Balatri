@@ -1,4 +1,4 @@
-package event;
+package event.InputEvent;
 
 public enum PlayerAction {
     CARD_CHOSE,

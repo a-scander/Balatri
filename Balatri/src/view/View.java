@@ -1,11 +1,11 @@
 package view;
 
 import controller.GameController;
-import event.AppEvent;
+import event.OutputEvent.GameEvent;
 import model.GameState;
 
 public interface View  {
-    public void onEvent(AppEvent event, GameState state);
+    public void onEvent(GameEvent event, GameState state);
 
     public void launch(GameController controller);
 }
