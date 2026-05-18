@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/*Quatre doigts: les suites et couleurs peuvent scorer avec seulement 4 cartes
- Raccourci: Les suites  */
+/* Les Jokers qui influent sur la manière d'évaluer les mains:
+ Quatre doigts: les suites et couleurs peuvent scorer avec seulement 4 cartes
+ Raccourci: Les suites peuvent être formées avec des espacement de *1* entre les cartes */
 
 public class HandEvaluator {
 
@@ -48,20 +49,22 @@ public class HandEvaluator {
         return high.rank().getValue() - low.rank().getValue() == 4;
     }
     
-    //Carre
+//Carre
     private static boolean checkFourOfAKind(List<Card> cards) {
         return CardUtils.getRankCounts(cards).containsValue(4L);
     }
 
-    //Full 
+//Full 
     private static boolean checkFullHouse(List<Card> cards) {
         Map<Integer, Long> counts = CardUtils.getRankCounts(cards);
         return counts.containsValue(3L) && counts.containsValue(2L);
     }
+
 //Brelan
     private static boolean checkThreeOfAKind(List<Card> cards) {
         return CardUtils.getRankCounts(cards).containsValue(3L);
     }
+
 //Double paire
     private static boolean checkTwoPair(List<Card> cards) {
         int pairCount = 0;

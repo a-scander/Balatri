@@ -25,126 +25,28 @@ public final class Zen6View implements View {
     private ApplicationContext context;
     private UIHandContainer HandContainer;
 
-    public static Zen6View initGameGraphics(GameState state, GameController controller) { /*TODO: make a contructor instead */
-        var view = new Zen6View();
-        view.controller = controller;
-        view.HandContainer = new UIHandContainer(20, 200, 1000, 200, 0);
-        view.addUIObject(view.HandContainer);
+    public Zen6View(GameController controller) {
+        this.controller = controller;
+
+        /*Temporary */
+        this.HandContainer = new UIHandContainer(20, 200, 1000, 200, 0);
+        addUIObject(this.HandContainer);
         var playButton = new Button(
             (ctrl, gs) -> ctrl.onAction(PlayerAction.PLAY_HAND, null),
-            20,
-            420,
-            200,
-            50,
-            1
-        );
-        view.addUIObject(playButton);
-        return view;
+            20,  420, 200, 50, 1);
+        addUIObject(playButton);
     }
 
-    public boolean isUICard(UIObject obj) {
-        return switch(obj){
-            case UICard _ -> true;
-            default -> false;
-        };
-    }
-
-    private void selectCards(List<Card> changedCards, boolean isSelected){
-        HandContainer.selectCards(changedCards, isSelected);
-    }
-
-    private void addCards(List<Card> changedCards) {
-        changedCards.forEach(HandContainer::addCard);
-        HandContainer.recomputeCardsCoordinates();
-        redraw();
-    }
-
-    private void removeCards(List<Card> removedCards){
-        removedCards.forEach(HandContainer::removeCard);
-        HandContainer.recomputeCardsCoordinates();
-        redraw();
-    }
-
-    private void refreshHand(GameState state) {
-        HandContainer.removeAllCards();
-        state.getCurrentBlind().getHand().getCards().forEach(HandContainer::addCard);
-        state.getCurrentBlind().getSelectedCards().forEach(HandContainer::addCard);
-        HandContainer.recomputeCardsCoordinates();
-        redraw();
-    }
-
-    private void drawFrame(Graphics2D graphics) {
-        var clip = graphics.getClipBounds();
-        if (clip != null) {
-            graphics.setColor(Color.WHITE);
-            graphics.fillRect(clip.x, clip.y, clip.width, clip.height);
-        }
-
-        for (UIObject obj : getUIObjects()) {
-            obj.draw(graphics);
-        }
-    }
-    
-    public void draw(ApplicationContext context) {
-        this.context = context;
-        context.renderFrame(this::drawFrame);
-    }
-
-    private void redraw() {
-        if (context != null) {
-            context.renderFrame(this::drawFrame);
-        }
-    }
-
-    public void addUIObject(UIObject obj) {
-        uiObjects.add(obj);
-    }
-    
-    public void removeUIObject(UIObject obj) {
-        uiObjects.remove(obj);
-    }
-    
-    public List<UIObject> getUIObjects() {
-        return new ArrayList<>(uiObjects);
-    }
-    
-    public UIObject getClickedObject(Point location) {//to change
-        UIObject best = null;
-        int bestZ = Integer.MIN_VALUE;
-
-        for (UIObject obj : uiObjects) {
-            if (!obj.contains(location)) continue;
-
-            switch(obj){
-                case UICard card -> {
-                    if (card.zDepth() > bestZ) {
-                        best = card;
-                        bestZ = card.zDepth();
-                    }
-                }
-                case Button button -> {
-                    if (button.zDepth() > bestZ) {
-                        best = button;
-                        bestZ = button.zDepth();
-                    }
-                }
-                case UIRectangle _ -> {}
-                case UIHandContainer c -> {
-                    if (c.zDepth() > bestZ) {
-                        best = c;
-                        bestZ = c.zDepth();
-                    }
-                    for (UICard card : c.getCards()) {
-                        if (card.contains(location) && card.zDepth() > bestZ) {
-                            best = card;
-                            bestZ = card.zDepth();
-                        }
-                    }
-                }
+    @Override
+    public void launch(GameController controller) {
+        Application.run(Color.WHITE, context -> {
+            this.context = context;
+            redraw();
+            while (true) {
+                var event = context.pollOrWaitEvent(10);
+                processEvent(event, controller.getState());
             }
-        }
-
-        return best;
+        });
     }
 
     @Override
@@ -160,6 +62,46 @@ public final class Zen6View implements View {
         redraw();
     }
 
+    private void drawFrame(Graphics2D graphics) {
+        for (UIObject obj : getUIObjects()) {
+            obj.draw(graphics);
+        }
+    }
+
+    private void redraw() {context.renderFrame(this::drawFrame);}
+
+    public void addUIObject(UIObject obj) {uiObjects.add(obj);}
+    
+    public void removeUIObject(UIObject obj) {uiObjects.remove(obj);}
+    
+    public List<UIObject> getUIObjects() {return new ArrayList<>(uiObjects);}
+    
+    private UIObject updateBest(UIObject candidate, UIObject currentBest, int[] bestZ) {
+        if (candidate.zDepth() > bestZ[0]) {
+            bestZ[0] = candidate.zDepth();
+            return candidate;
+        }
+        return currentBest;
+    }
+    
+    public UIObject getClickedObject(Point location) {
+        UIObject best = null;
+        int[] bestZ = { Integer.MIN_VALUE };
+        for (UIObject obj : uiObjects) {
+            if (!obj.contains(location)) {continue;}
+    
+            best = updateBest(obj, best, bestZ);
+            if (obj instanceof UIHandContainer c) { // this or ugly pattern matching :/ (PM better when more UIObjects)
+                for (UICard card : c.getCards()) {
+                    if (card.contains(location)) {
+                        best = updateBest(card, best, bestZ);
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
     public void processEvent(Event event, GameState state) {
         // Process any queued actions from non-GUI threads (e.g., console)
         controller.processQueuedActions();
@@ -168,42 +110,59 @@ public final class Zen6View implements View {
             case null:
                 break;
             case KeyboardEvent ke:
-                if (ke.action() != KeyboardEvent.Action.KEY_PRESSED) {return;}
-                if(ke.key() == KeyboardEvent.Key.Q){
-                    controller.onAction(PlayerAction.QUIT_GAME, null);
-                }
-                if(ke.key() == KeyboardEvent.Key.SPACE){
-                    controller.onAction(PlayerAction.PLAY_HAND, null);
-                    redraw();
-
-                }
+                processKeyboardEvent(ke);
                 break;
 
             case PointerEvent pe:
-                if (pe.action() != PointerEvent.Action.POINTER_DOWN) {return;}
-                var location = pe.location();
-                UIObject clickedObject = getClickedObject(new Point(location.x(), location.y()));
-                //IO.println("PointerEvent at " + location.x() + "," + location.y() + " -> clicked: " + clickedObject);
-                switch (clickedObject) {
-                    case UICard uiCard -> controller.onAction(PlayerAction.CARD_CHOSE, uiCard.getCard());
-                    case Button button -> button.onClick(controller, state);
-                    case UIRectangle _, UIHandContainer _ -> {}
-                    case null -> {}
-                }
-                redraw();
-
+                processPointerEvent(pe, state);
+                break;
         }
     }
 
-    @Override
-    public void launch(GameController controller) {
-        Application.run(Color.WHITE, context -> {
-            this.context = context;
+    private void processKeyboardEvent(KeyboardEvent ke) {
+        if (ke.action() != KeyboardEvent.Action.KEY_PRESSED) {return;}
+        // maybe a switch ?
+        if(ke.key() == KeyboardEvent.Key.Q){
+            controller.onAction(PlayerAction.QUIT_GAME, null);
+            context.dispose();
+        }
+        if(ke.key() == KeyboardEvent.Key.SPACE){
+            controller.onAction(PlayerAction.PLAY_HAND, null);
             redraw();
-            while (true) {
-                var event = context.pollOrWaitEvent(10);
-                processEvent(event, controller.getState());
-            }
-        });
+        }
+    }
+
+    private void processPointerEvent(PointerEvent pe, GameState state) {
+        if (pe.action() != PointerEvent.Action.POINTER_DOWN) {return;/* Might do something for semi-clicks */}
+        var location = pe.location();
+        UIObject clickedObject = getClickedObject(new Point(location.x(), location.y()));
+        // IO.println("PointerEvent at " + location.x() + "," + location.y() + " -> clicked: " + clickedObject);
+        switch (clickedObject) {
+            case UICard uiCard -> controller.onAction(PlayerAction.CARD_CHOSE, uiCard.getCard());
+            case Button button -> button.onClick(controller, state);
+            case UIRectangle _, UIHandContainer _ -> {}
+        }
+        redraw();
+    }
+
+    private void selectCards(List<Card> changedCards, boolean isSelected){
+        HandContainer.selectCards(changedCards, isSelected);
+    }
+
+    private void addCards(List<Card> changedCards) {
+        changedCards.forEach(HandContainer::addCard);
+        HandContainer.recomputeCardsCoordinates();
+    }
+
+    private void removeCards(List<Card> removedCards){
+        removedCards.forEach(HandContainer::removeCard);
+        HandContainer.recomputeCardsCoordinates();
+    }
+
+    private void refreshHand(GameState state) {
+        HandContainer.removeAllCards();
+        state.getCurrentBlind().getHand().getCards().forEach(HandContainer::addCard);
+        state.getCurrentBlind().getSelectedCards().forEach(HandContainer::addCard);
+        HandContainer.recomputeCardsCoordinates();
     }
 }

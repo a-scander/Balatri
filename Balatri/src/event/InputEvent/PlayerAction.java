@@ -1,5 +1,6 @@
 package event.InputEvent;
 
+// Might do an interface with classes for better extensibility and readability in GameState instead of Object type casting
 public enum PlayerAction {
     CARD_CHOSE,
     PLAY_HAND,

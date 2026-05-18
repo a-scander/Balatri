@@ -5,38 +5,19 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import domain.*;
-import event.OutputEvent.BlindBeaten;
-import event.OutputEvent.BlindOnGoing;
-import event.OutputEvent.GameEvent;
-import event.OutputEvent.GameOver;
-import event.OutputEvent.GameWon;
-import event.OutputEvent.HandDiscarded;
-import event.OutputEvent.HandDrawn;
-import event.OutputEvent.HandPlayed;
-
+import event.OutputEvent.*;
 
 public class GameState {
 	private final Blind[] blinds;
 	private int blindIndex;
 	private Blind currentBlind;
 	
-	private final Map<Planet, Integer> planetsObtained;
-	/*int Mooooney, List<Jokers>(A mettre dans blind peut être), List<Comsumable> (TarotCard and planet in comsumable area) */
+	private final Map<Planet, Integer> planetsObtained = new EnumMap<>(Planet.class);
+	/*int Mooooney, 
+	* List<Jokers>(A mettre dans blind peut être), 
+	* List<Comsumable> (TarotCard and planet in comsumable area) 
+	*/
 	private Phase phase;
-
-	
-	public GameState() {
-		this.blinds = new Blind[] {
-			new Blind("Small Blind", BlindType.SMALL_BLIND, 30),
-			new Blind("Big Blind",   BlindType.BIG_BLIND,   60) 
-			// new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
-		};
-		this.blindIndex = 0;
-		this.planetsObtained = new EnumMap<>(Planet.class);
-		this.currentBlind = blinds[blindIndex];
-		this.phase = Phase.INITIALIZE;
-	}
-
 	public enum Phase {
 		INITIALIZE,
 		MAIN_SCREEN,
@@ -46,21 +27,29 @@ public class GameState {
 		GAME_OVER
 	}
 
-	public Blind getCurrentBlind()           { return currentBlind; }
+	public GameState() {
+		/* Test values */
+		this.blinds = new Blind[] {
+			new Blind("Small Blind", BlindType.SMALL_BLIND, 30),
+			new Blind("Big Blind",   BlindType.BIG_BLIND,   60) 
+			// new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
+		};
+		this.blindIndex = 0;
+		this.currentBlind = blinds[blindIndex];
+		this.phase = Phase.INITIALIZE;
+	}
+
+	public Blind getCurrentBlind()			{ return currentBlind; }
 	public Map<Planet, Integer> getPlanetsObtained() { return planetsObtained; }
-	public int getBlindIndex()               { return blindIndex; }
-	public Phase getPhase() 				 { return phase; }
-	public void setPhase(Phase phase) 		 { this.phase = phase; }
+	public int getBlindIndex()				{ return blindIndex; }
+	public Phase getPhase()					{ return phase; }
+	public void setPhase(Phase phase)		{ this.phase = phase; }
+	public GameEvent drawHand()				{ return new HandDrawn(currentBlind.drawHand()); }
 
 	public GameEvent selectCard(Card card) {
-
 		//TODO: if size is good select else message
 		//if (currentblind.maxselectSize < currentblind.getSelectedCards().size() || modifiers has changed mas selection size)
 		return currentBlind.selectCard(card);
-	}
-
-	public GameEvent drawHand(){
-		return new HandDrawn(currentBlind.drawHand());
 	}
 
 	public GameEvent onPlayHand() {
@@ -88,17 +77,19 @@ public class GameState {
 		if(currentBlind.blindIsLost()) {
 			return new GameOver();
 		}
+
 		if(currentBlind.getScore() < currentBlind.getTargetScore()) {
 			return new BlindOnGoing();
 		}
+
 		if (blindIndex < blinds.length - 1) {
 				blindIndex++;
 				currentBlind = blinds[blindIndex];
 				return new BlindBeaten();
 		}
+		
 		return new GameWon();
 	}
-
 
     public GameEvent onDiscard() {
         currentBlind.discard();
@@ -106,7 +97,7 @@ public class GameState {
 	}
 
     public GameEvent onQuitGame() {
-        //TODO : saving the current state and game
+        //TODO : saving the current state and game in the controller
 		return new GameOver();
     }
 }

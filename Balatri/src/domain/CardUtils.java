@@ -95,14 +95,14 @@ public class CardUtils {
     }
 
    // [4H, 4D, 9S, 13C, 2H] -> [2H, 4H, 9S, 13C]  
-public static List<Card> uniqueValues(List<Card> cards) {
-    return cards.stream()
-            .collect(Collectors.toMap(
-                card -> card.rank().getValue(),
-                card -> card,
-                (a, b) -> a
-            ))
-            .values().stream()
-            .toList();
-}
+    public static List<Card> uniqueValues(List<Card> cards) {
+        return cards.stream()
+                .collect(Collectors.toMap(
+                    card -> card.rank().getValue(),
+                    card -> card,
+                    (a, b) -> a
+                ))
+                .values().stream()
+                .toList();
+    }
 }

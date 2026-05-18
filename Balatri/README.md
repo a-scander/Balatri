@@ -19,6 +19,7 @@ GameController:
 startBlind: this is only a test, should be replaced by the actual blind initialization logic
 onAction: blind changing logic and shop
 onAction: calculate money won and apply jokers that execute on last hand
+onAction: add phase changes
 
 GameState.java:
 Line 57: if size is good select else message

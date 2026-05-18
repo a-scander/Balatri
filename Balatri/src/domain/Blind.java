@@ -7,10 +7,10 @@ import java.util.Objects;
 import event.OutputEvent.CardSelected;
 import event.OutputEvent.CardUnselected;
 import event.OutputEvent.GameEvent;
-
+/*Not a simple class but still in domain package, maybe to move to another one */
 public class Blind {
     private final String name;
-    private final BlindType type;
+    private final BlindType type; // Will be useful once we implement special effects blind ? 
     private final int targetScore;
     private int score;
 	private int handsCurrent;
@@ -18,10 +18,9 @@ public class Blind {
 	private int discardCurrent;
     private final int discardPerBlind = 4;
 	private final Deck deck;
-    private final List<Card> discard;
+    private final List<Card> discard = new ArrayList<>();
     private final Hand hand;
-    private final List<Card> selectedCards;
-
+    private final List<Card> selectedCards = new ArrayList<>();
 
     public Blind(String name, BlindType type, int targetScore) {
         Objects.requireNonNull(name, "Blind name cannot be null");
@@ -33,27 +32,27 @@ public class Blind {
         this.type = type;
         this.targetScore = targetScore;
         this.score = 0;
-        this.handsCurrent = handsPerBlind;
-        this.discardCurrent = discardPerBlind;
+        this.handsCurrent = handsPerBlind; // Should not be a constant
+        this.discardCurrent = discardPerBlind; // Should not be a constant
         this.deck = new Deck();
-        this.hand = new Hand(8);
-        this.selectedCards   = new ArrayList<>();
-        this.discard = new ArrayList<>();
+        this.hand = new Hand(8); // Should not be a constant
     }
 
-    public String getName() {return name;}
-    public List<Card> getSelectedCards() {return selectedCards;}
-    public int getScore() {return score;}
-    public int getHandsCurrent() {return handsCurrent;}
-    public int getDiscardCurrent() {return discardCurrent;}
-    public Hand getHand() {return hand;}
-    public int getTargetScore() {return targetScore;}
+    public String getName()                 { return name;}
+    public List<Card> getSelectedCards()    { return selectedCards;}
+    public int getScore()                   { return score;}
+    public int getHandsCurrent()            { return handsCurrent;}
+    public int getDiscardCurrent()          { return discardCurrent;}
+    public Hand getHand()                   { return hand;}
+    public int getTargetScore()             { return targetScore;}
+    public boolean blindIsLost()            { return handsCurrent >= handsPerBlind && score < targetScore;}
+
 
     public GameEvent selectCard(Card card) {
         if (selectedCards.contains(card)) {
             selectedCards.remove(card);
             hand.getCards().add(card);
-            return new CardUnselected(List.of(card));
+            return new CardUnselected(List.of(card)); // Maybe List.of is Overkilled but else more complex in classes inheritace so loose/loose
         }
 
         selectedCards.add(card);
@@ -61,16 +60,12 @@ public class Blind {
         return new CardSelected(List.of(card));
     }
 
-    public boolean blindIsLost(){
-        return handsCurrent >= handsPerBlind && score < targetScore;
-    }
 
     public void playHand(int score){
         this.score += score;
         handsCurrent++;
         discard.addAll(selectedCards);
         selectedCards.clear();
-        // discardFullHand();
     }
 
     public List<Card> drawHand() {

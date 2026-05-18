@@ -12,6 +12,7 @@ public enum Planet {
     TERRE   (HandType.FULL_HOUSE,     25, 2),
     MARS    (HandType.FOUR_OF_A_KIND, 30, 3),
     NEPTUNE (HandType.STRAIGHT_FLUSH, 40, 4);
+    /* Easy to add the hidden planets ;P */
 
     private final HandType targetHand;
     private final int bonusChips;

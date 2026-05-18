@@ -8,9 +8,7 @@ public record Card(Rank rank, Suit suit) {
         Objects.requireNonNull(suit);
     }
 
-    public boolean isAce(){
-        return rank == Rank.ACE;
-    }
+    public boolean isAce(){return rank == Rank.ACE;}
 
     @Override
     public String toString() {

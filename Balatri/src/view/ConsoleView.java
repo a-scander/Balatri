@@ -17,7 +17,20 @@ public final class ConsoleView implements View {
         this.controller = controller;
     }
 
+    @Override
+    public void launch(GameController controller) {
+        this.running = true;
+
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (running && scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                processInput(line);
+            }
+        }
+    }
+
     // Handles incoming game engine events and routes them to specific UI display methods.
+    // Overly simplified for now, but can be expanded to handle more complex UI updates as needed.
     @Override
     public void onEvent(GameEvent event, GameState state) {
         switch(event) {
@@ -31,18 +44,6 @@ public final class ConsoleView implements View {
             case GameOver _        -> onGameOver();
             case GameWon _         -> onGameWon();
             default -> {}
-        }
-    }
-
-    @Override
-    public void launch(GameController controller) {
-        this.running = true;
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (running && scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                processInput(line);
-            }
         }
     }
 

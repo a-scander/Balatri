@@ -2,11 +2,14 @@ package view.zen6;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.function.BiConsumer;
+
 import model.GameState;
 
 import controller.GameController;
 
-public record Button(java.util.function.BiConsumer<GameController, GameState> action, int x, int y, int width, int height, int zDepth) implements UIObject {
+//The comsumer might be over the top in terms of parameters
+public record Button(BiConsumer<GameController, GameState> action, int x, int y, int width, int height, int zDepth) implements UIObject {
     public void onClick(GameController controller, GameState state){
         action.accept(controller, state);
     }

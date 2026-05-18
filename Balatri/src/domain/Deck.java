@@ -5,15 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class Deck {
-	private List<Card> deckCards;
-	private List<Card> discardCards;
+	private final List<Card> deckCards = new ArrayList<>();
+	private final List<Card> discardCards = new ArrayList<>();
 
-
-	public Deck() {
-		this.deckCards = new ArrayList<>();
-		this.discardCards = new ArrayList<>();
-		initializeDeck();
-	}
+	public Deck() {initializeDeck();}
 	
 	private void initializeDeck() {
 		for (Suit suit : Suit.values()) { 
@@ -30,28 +25,17 @@ public class Deck {
         	discardCards.clear();
             Collections.shuffle(deckCards);
         }
+
         List<Card> drawn = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            drawn.add(deckCards.remove(deckCards.size() - 1));
+            drawn.add(deckCards.remove(deckCards.size() - 1)); //Maybe a check for each drawn card if the deck still has enough remaining cards
         }
         return drawn;
     }
 	
-	public void discardCards(List<Card> cards) {
-		discardCards.addAll(cards);
-	}
+	public void discardCards(List<Card> cards) {discardCards.addAll(cards);}
 
-	public List<Card> deckCards() {
-		return deckCards;
-	}
+	public List<Card> deckCards() {return deckCards;}
 
-	public List<Card> getDiscardCards() {
-		return discardCards;
-	}
-
-	
-	
-	
-	
-	
+	public List<Card> getDiscardCards() {return discardCards;}
 }

@@ -6,27 +6,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Hand {
-    private List<Card> cardsHand;
+    private final List<Card> cardsHand = new ArrayList<>();
     private int maxSize; 
     
 
     public Hand(int maxSize) {
-        this.cardsHand = new ArrayList<>();
         this.maxSize = maxSize;
     }
 
     public int getMaxSize() {
         return maxSize;
-    }
-
-    // Adds a list of cards (drawn from the deck) to the hand if there is enough space.
-    public boolean addCard(List<Card> deck) {
-
-    	if (this.cardsHand.size() + deck.size() <= this.maxSize) {
-            this.cardsHand.addAll(deck);
-            return true; 
-        }
-        return false; 
     }
 
     // Clears the entire hand
@@ -48,7 +37,7 @@ public class Hand {
 	}
 
     public void setCards(List<Card> newCards) {
-        this.cardsHand = new ArrayList<>(newCards);
+        this.cardsHand.addAll(newCards);
     }
     
     // Creates a new sorted copy of the hand
