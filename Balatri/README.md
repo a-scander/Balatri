@@ -13,6 +13,15 @@ arguments:
     - zen: Pour ne lancer que la vue zen  
 
 
+Tasks done:  
+- Cards, Deck, Blinds, and other domain classes
+- Main event system with controller
+- GamState which holds the blinds and game logic
+- View interface, ConsoleView and Zen6View
+- Planets logic and computation logic
+- Active discard without inputs connexion
+- Placeholders in GameState, Blind and HandEvaluator to welcome Hand modifying Jokers 
+
 Remaining Tasks:
 
 - Les jokers -> trois phases d'évaluation de la main
