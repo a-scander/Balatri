@@ -1,11 +1,9 @@
-import model.GameState;
 import view.*;
 import controller.GameController;
 
 public class Main {
 	public static void main(String[] args) {
-		GameState state     = new GameState();
-		GameController ctrl = new GameController(state);
+		GameController ctrl = new GameController();
 
 		// Link the view to the controller
 		if(args.length > 0 && args[0].equals("console")) {
@@ -15,7 +13,6 @@ public class Main {
 			ctrl.addView(new ConsoleView(ctrl)); /*Multi-Threading test */
 		}
 
-		ctrl.startGame();
 		ctrl.launch();
 	}
 }

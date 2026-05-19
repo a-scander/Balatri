@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import domain.Card;
+import model.GameState;
 
 public final class UIHandContainer implements UIObject {
     private int x;
@@ -48,8 +49,18 @@ public final class UIHandContainer implements UIObject {
             .thenComparing(c -> c.getCard().suit().ordinal()));
     }
 
+    public void addCards(List<Card> changedCards) {
+        changedCards.forEach(c -> addCard(c));
+        recomputeCardsCoordinates();
+    }
+
     public void addCard(Card card){
         cards.add(new UICard(card, 0, 0, 100, 150, zDepth + 1, false));
+    }
+
+    public void removeCards(List<Card> removedCards){
+        removedCards.forEach(c -> removeCard(c));
+        recomputeCardsCoordinates();
     }
 
     public void removeCard(Card card){
@@ -58,12 +69,6 @@ public final class UIHandContainer implements UIObject {
                 cards.remove(c);
                 break;
             }
-        }
-    }
-
-    public void removeCards(List<Card> removedCards){
-        for(var card: removedCards){
-            removeCard(card);
         }
     }
 
@@ -92,6 +97,12 @@ public final class UIHandContainer implements UIObject {
                 IO.println("Exception: Current hand does not correspond with requested card: " + card);
             }
         }
+    }
+
+    public void refreshHand(List<Card> cards) {
+        removeAllCards();
+        cards.forEach(c -> addCard(c));
+        recomputeCardsCoordinates();
     }
 
     public void removeAllCards(){

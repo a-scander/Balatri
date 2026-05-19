@@ -8,8 +8,8 @@ import view.zen6.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 
 import com.github.forax.zen.Application;
@@ -17,6 +17,7 @@ import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.Event;
 import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.PointerEvent;
+import com.github.forax.zen.ScreenInfo;
 
 import controller.GameController;
 import domain.Card;
@@ -26,6 +27,8 @@ public final class Zen6View implements View {
     private GameController controller;
     private ApplicationContext context;
 
+    private UIHandContainer uiHandContainer = null;
+
     public Zen6View(GameController controller) {
         this.controller = controller;
     }
@@ -34,23 +37,32 @@ public final class Zen6View implements View {
     public void launch(GameController controller) {
         Application.run(Color.WHITE, context -> {
             this.context = context;
+            buildMainMenu();
             redraw();
             while (true) {
                 var event = context.pollOrWaitEvent(10);
-                processEvent(event, controller.getState());
+                processEvent(event);
             }
         });
     }
 
     @Override
-    public void onEvent(GameEvent event, GameState state) {
+    public void onEvent(GameEvent event) {
         switch (event) {
-            case HandPlayed hp -> refreshHand(state);
-            case CardUnselected us -> {selectCards(us.changedCards(), false);}
-            case CardSelected cs -> {selectCards(cs.changedCards(), true);}
-            case HandDrawn hd -> {addCards(hd.changedCards());}
-            case HandDiscarded hd -> {removeCards(hd.changedCards());} 
-            case BlindBeaten _, BlindOnGoing _, GameOver _, GameWon _ -> {}
+            case HandPlayed hp -> {
+                GameState state = controller.getState();
+                List<Card> cards = Stream.concat(
+                    state.getCurrentBlind().getHand().getCards().stream(),
+                    state.getCurrentBlind().getSelectedCards().stream()).toList();
+                uiHandContainer.refreshHand(cards);
+            }
+            case CardUnselected us -> {uiHandContainer.selectCards(us.changedCards(), false);}
+            case CardSelected cs -> {if(cs.changedCards() == null){break;}uiHandContainer.selectCards(cs.changedCards(), true);}
+            case HandDrawn hd -> {uiHandContainer.addCards(hd.changedCards());}
+            case HandDiscarded hd -> {uiHandContainer.removeCards(hd.changedCards());} 
+            case BlindBeaten _, BlindOnGoing _ -> {}
+            case GameOver _ -> {buildEndMenu("You Lost");}
+            case GameWon _ -> {buildEndMenu("You Win");}
             case PhaseChange pc -> buildPhaseUI(pc.phase());
         }
         redraw();
@@ -77,7 +89,7 @@ public final class Zen6View implements View {
     public List<UIObject> getUIObjects() {return new ArrayList<>(uiObjects);}
 
     private void drawBackground(Graphics2D graphics){
-        graphics.clearRect(0, 0, context.getScreenInfo().height(), context.getScreenInfo().width());
+        graphics.clearRect(0, 0, context.getScreenInfo().width(), context.getScreenInfo().height());
     }
     
     private UIObject updateBest(UIObject candidate, UIObject currentBest, int[] bestZ) {
@@ -106,7 +118,7 @@ public final class Zen6View implements View {
         return best;
     }
 
-    public void processEvent(Event event, GameState state) {
+    public void processEvent(Event event) {
         // Process any queued actions from non-GUI threads (e.g., console)
         controller.processQueuedActions();
         
@@ -118,7 +130,7 @@ public final class Zen6View implements View {
                 break;
 
             case PointerEvent pe:
-                processPointerEvent(pe, state);
+                processPointerEvent(pe);
                 break;
         }
     }
@@ -136,14 +148,14 @@ public final class Zen6View implements View {
         }
     }
 
-    private void processPointerEvent(PointerEvent pe, GameState state) {
+    private void processPointerEvent(PointerEvent pe) {
         if (pe.action() != PointerEvent.Action.POINTER_DOWN) {return;/* Might do something for semi-clicks */}
         var location = pe.location();
         UIObject clickedObject = getClickedObject(new Point(location.x(), location.y()));
         
         switch (clickedObject) {
             case UICard uiCard -> controller.onAction(PlayerAction.CARD_CHOSE, uiCard.getCard());
-            case Button button -> button.onClick(controller, state);
+            case Button button -> button.onClick(controller);
             case UIRectangle _, UIHandContainer _ -> {}
             case null -> {}
         }
@@ -156,70 +168,69 @@ public final class Zen6View implements View {
             case MAIN_SCREEN -> buildMainMenu();
             case BLIND_SELECTION -> buildBlindSelectionMenu();
             case IN_BLIND -> buildBlindUI();
-            case GAME_OVER -> buildGameOverMenu();
+            case GAME_OVER -> {}
             default -> {}
         }
-        IO.println(uiObjects);
         redraw();
     }
 
     private void buildMainMenu() {
         uiObjects.clear();
+        uiHandContainer = null;
+        int X = 10, Y = 10;
+        int width = 250, height = 80;
+        if(this.context != null){
+            ScreenInfo si = this.context.getScreenInfo();
+            X = si.width()/2 - width/2;
+            Y = si.height()/2 - height/2;
+        }
 
         var startButton = new Button(
-            (ctrl, gs) -> ctrl.onAction(PlayerAction.START_GAME, null), "startGame",
-            400, 300, 250, 80, 1
-        );
+            (ctrl) -> ctrl.startGame(), "startGame", X, Y, width, height, 1);
     
         addUIObject(startButton);
     }
 
     private void buildBlindSelectionMenu() {
         uiObjects.clear();
+        uiHandContainer = null;
 
         var blindButton = new Button(
-            (ctrl, gs) -> ctrl.onAction(PlayerAction.SELECT_BLIND , null), "Select this blind",
-            400, 600, 250, 80, 1
-        );
+            (ctrl) -> ctrl.onAction(PlayerAction.SELECT_BLIND , null), "Select this blind",
+            400, 300, 250, 80, 1);
     
         addUIObject(blindButton);
     }
 
     private void buildBlindUI() {
-        UIHandContainer hc = new UIHandContainer(
+        this.uiHandContainer = new UIHandContainer(
             20, 200, 1000, 200, 0
         );
     
-        addUIObject(hc);
+        addUIObject(this.uiHandContainer);
     
         var playButton = new Button(
-            (ctrl, gs) -> ctrl.onAction(PlayerAction.PLAY_HAND, null), "playhand" ,
+            (ctrl) -> ctrl.onAction(PlayerAction.PLAY_HAND, null), "playhand" ,
             20, 420, 200, 50, 1
         );
     
         addUIObject(playButton);
     }
 
-    private void buildGameOverMenu(){}
+    private void buildEndMenu(String message){
+        uiObjects.clear();
+        uiHandContainer = null;
 
-    private void selectCards(List<Card> changedCards, boolean isSelected){/*
-                HandContainer.selectCards(changedCards, isSelected);*/
-    }
+        int width = 250, height = 80;
+        ScreenInfo si = this.context.getScreenInfo();
+        int X = si.width()/2 - width/2;
+        int Y = si.height()/2 - height/2;
 
-    private void addCards(List<Card> changedCards) {/*
-        changedCards.forEach(HandContainer::addCard);
-        HandContainer.recomputeCardsCoordinates();*/
-    }
+        var playButton = new Button(
+            (ctrl) -> ctrl.startGame(), message ,
+            X, Y, width ,height, 1
+        );
 
-    private void removeCards(List<Card> removedCards){/*
-        removedCards.forEach(HandContainer::removeCard);
-        HandContainer.recomputeCardsCoordinates();*/
-    }
-
-    private void refreshHand(GameState state) {/*
-        HandContainer.removeAllCards();
-        state.getCurrentBlind().getHand().getCards().forEach(HandContainer::addCard);
-        state.getCurrentBlind().getSelectedCards().forEach(HandContainer::addCard);
-        HandContainer.recomputeCardsCoordinates();*/
+        addUIObject(playButton);
     }
 }

@@ -32,8 +32,8 @@ public class Blind {
         this.type = type;
         this.targetScore = targetScore;
         this.score = 0;
-        this.handsCurrent = handsPerBlind; // Should not be a constant
-        this.discardCurrent = discardPerBlind; // Should not be a constant
+        this.handsCurrent = 0; // Should not be a constant
+        this.discardCurrent = 0; // Should not be a constant
         this.deck = new Deck();
         this.hand = new Hand(8); // Should not be a constant
     }
@@ -54,12 +54,12 @@ public class Blind {
             hand.getCards().add(card);
             return new CardUnselected(List.of(card)); // Maybe List.of is Overkilled but else more complex in classes inheritace so loose/loose
         }
+        if(selectedCards.size() > 4)return new CardSelected(null);
 
         selectedCards.add(card);
         hand.getCards().remove(card);
         return new CardSelected(List.of(card));
     }
-
 
     public void playHand(int score){
         this.score += score;
@@ -75,12 +75,14 @@ public class Blind {
     }
 
     public void discard() {
+        if(discardCurrent >= discardPerBlind)return;
         discardCurrent++;
         discard.addAll(selectedCards);
         selectedCards.clear();
     }
 
     public void discardFullHand() {
+        if(discardCurrent >= discardPerBlind)return;
         discardCurrent++;
         discard.addAll(hand.getCards());
         hand.getCards().clear();

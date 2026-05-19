@@ -3,16 +3,13 @@ package view.zen6;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.util.function.BiConsumer;
-
-import model.GameState;
+import java.util.function.Consumer;
 
 import controller.GameController;
 
-//The comsumer might be over kill in terms of parameters
-public record Button(BiConsumer<GameController, GameState> action, String name, int x, int y, int width, int height, int zDepth) implements UIObject {
-    public void onClick(GameController controller, GameState state){
-        action.accept(controller, state);
+public record Button(Consumer<GameController> action, String name, int x, int y, int width, int height, int zDepth) implements UIObject {
+    public void onClick(GameController controller){
+        action.accept(controller);
     }
     
     @Override

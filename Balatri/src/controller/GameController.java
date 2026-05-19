@@ -17,10 +17,10 @@ public class GameController {
     private static record PendingAction(PlayerAction action, Object data) {}
     private final ConcurrentLinkedQueue<PendingAction> actionQueue = new ConcurrentLinkedQueue<>();
 
-    private final GameState state;
+    private GameState state;
     private final List<View> views = new ArrayList<>();
 
-    public GameController(GameState state) {this.state = state;}
+    public GameController() {}
     public GameState getState() {return state;}
     public void addView(View view) {this.views.add(view);}
 
@@ -50,11 +50,13 @@ public class GameController {
                 default -> {}
             }
         }
+		
+        startGame();
     }
 
     private void emit(GameEvent event) {
         for(View view : views){
-            view.onEvent(event, state);
+            view.onEvent(event);
         }
     }
 
@@ -87,7 +89,6 @@ public class GameController {
 
     public void playHand() {
         GameEvent playResult = state.onPlayHand();
-        //IO.println("Play hand result: " + playResult);
         if(playResult == null){
             IO.println("No cards selected, cannot play hand.");
             return;
@@ -97,24 +98,21 @@ public class GameController {
 
         GameEvent outcome = state.checkOutcome();
         switch(outcome){
-            case BlindBeaten _ -> changePhase(Phase.BLIND_SELECTION);
+            case BlindBeaten _ -> {if(state.getPhase() != Phase.BLIND_SELECTION)changePhase(Phase.BLIND_SELECTION);}
 
-            case BlindOnGoing _ -> changePhase(Phase.IN_BLIND);
+            case BlindOnGoing _ -> {if(state.getPhase() != Phase.IN_BLIND)changePhase(Phase.IN_BLIND);}
 
-            case GameOver _ -> changePhase(Phase.GAME_OVER);
+            case GameOver _ -> {if(state.getPhase() != Phase.GAME_OVER)changePhase(Phase.GAME_OVER);}
 
-            case GameWon _ -> changePhase(Phase.GAME_OVER);
+            case GameWon _ -> {if(state.getPhase() != Phase.GAME_OVER)changePhase(Phase.GAME_OVER);}
             default -> {}
         }
         emit(outcome);
     }
 
     public void startGame() {
-        if (views.isEmpty()) {
-            throw new IllegalStateException("View must be assigned before starting the game.");
-        }
-        
-        changePhase(Phase.MAIN_SCREEN);
+        this.state = new GameState();
+        changePhase(Phase.BLIND_SELECTION);
     }
 
     private void initializeGame() {
@@ -125,10 +123,9 @@ public class GameController {
 
     private void startBlind() {
         /*once the user has selected the blind starts it */
-        /*Should initialize the blind */
-        //TODO: this is only a test, should be replaced by the actual blind initialization logic
-        emit(state.drawHand());
+        /*Should initialize the blind properly*/
         changePhase(Phase.IN_BLIND);
+        emit(state.drawHand());
     }
 
     private void finishGame() {

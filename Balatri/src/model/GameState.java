@@ -77,6 +77,10 @@ public class GameState {
 		if (blindIndex < blinds.length - 1) {
 				blindIndex++;
 				currentBlind = blinds[blindIndex];
+				Planet p = Planet.getRandom();
+				planetsObtained.merge(p, 1, Integer::sum);
+				//DEBUG: TODO: an event PLANET_OBTAINED
+				IO.println(p);
 				return new BlindBeaten();
 		}
 		
