@@ -8,7 +8,9 @@ public class Main {
 		// Link the view to the controller
 		if(args.length > 0 && args[0].equals("console")) {
 			ctrl.addView(new ConsoleView(ctrl));
-		} else{
+		}else if(args.length > 0 && args[0].equals("zen")){
+			ctrl.addView(new Zen6View(ctrl));
+		}else{
 			ctrl.addView(new Zen6View(ctrl));
 			ctrl.addView(new ConsoleView(ctrl)); /*Multi-Threading test */
 		}

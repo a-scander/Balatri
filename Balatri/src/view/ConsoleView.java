@@ -41,7 +41,7 @@ public final class ConsoleView implements View {
             case HandDiscarded _   -> onHandDrawn();
             case HandPlayed hp      -> onHandPlayed(hp);
             case BlindBeaten _     -> onBlindBeaten();
-            case BlindOnGoing _    -> {}
+            case BlindOnGoing _    -> displayGameInfo();
             case GameOver _        -> onGameOver();
             case GameWon _         -> onGameWon();
             case PhaseChange pc    -> processPhaseChange(pc.phase());
@@ -50,7 +50,7 @@ public final class ConsoleView implements View {
 
     private void processInput(String input) {
         switch(input.trim().toUpperCase()) { //Needs to check for current phase to accept input :/
-            case "M" -> controller.queueAction(PlayerAction.START_GAME, null);
+            case "M" -> controller.startGame();
             case "L" -> controller.queueAction(PlayerAction.SELECT_BLIND, null);
             case "P" -> controller.queueAction(PlayerAction.PLAY_HAND, null);
             case "D" -> controller.queueAction(PlayerAction.DISCARD, null);

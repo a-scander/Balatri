@@ -14,7 +14,6 @@ import view.View;
 import view.Zen6View;
 
 public class GameController {
-    private static record PendingAction(PlayerAction action, Object data) {}
     private final ConcurrentLinkedQueue<PendingAction> actionQueue = new ConcurrentLinkedQueue<>();
 
     private GameState state;
@@ -50,8 +49,6 @@ public class GameController {
                 default -> {}
             }
         }
-		
-        startGame();
     }
 
     private void emit(GameEvent event) {
@@ -62,12 +59,13 @@ public class GameController {
 
     public void queueAction(PlayerAction action, Object data) {
         actionQueue.offer(new PendingAction(action, data));
+        processQueuedActions();
     }
 
     public void processQueuedActions() {
         PendingAction pending;
         while ((pending = actionQueue.poll()) != null) {
-            onAction(pending.action, pending.data);
+            onAction(pending.action(), pending.data());
         }
     }
 
