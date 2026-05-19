@@ -18,15 +18,7 @@ public class GameState {
 	* List<Comsumable> (TarotCard and planet in comsumable area) 
 	*/
 	private Phase phase;
-	public enum Phase {
-		INITIALIZE,
-		MAIN_SCREEN,
-		IN_SHOP,
-		BLIND_SELECTION,
-		IN_BLIND,
-		GAME_OVER
-	}
-
+	
 	public GameState() {
 		/* Test values */
 		this.blinds = new Blind[] {

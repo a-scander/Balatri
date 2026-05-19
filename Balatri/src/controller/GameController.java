@@ -8,7 +8,7 @@ import domain.*;
 import event.InputEvent.*;
 import event.OutputEvent.*;
 import model.GameState;
-import model.GameState.Phase;
+import model.Phase;
 import view.ConsoleView;
 import view.View;
 import view.Zen6View;
@@ -75,6 +75,8 @@ public class GameController {
             case PLAY_HAND -> { playHand();}
             case DISCARD -> emit(state.onDiscard());
             case QUIT_GAME -> emit(state.onQuitGame());
+            case START_GAME -> initializeGame();
+            case SELECT_BLIND -> startBlind();
             /*TODO: add phase changes
             * case START_GAME -> initializeGame();
             * case BLIND_SELECTED -> startBlind();
@@ -95,11 +97,13 @@ public class GameController {
 
         GameEvent outcome = state.checkOutcome();
         switch(outcome){
-            case BlindBeaten _ -> state.setPhase(Phase.BLIND_SELECTION);/*TODO: blind changing logic and shop */
-                                                                        /*TODO : calculate money won and apply jokers that execute on last hand */                                                    
-            case BlindOnGoing _ -> state.setPhase(Phase.IN_BLIND);
-            case GameOver _ -> state.setPhase(Phase.GAME_OVER);
-            case GameWon _ -> state.setPhase(Phase.GAME_OVER);
+            case BlindBeaten _ -> changePhase(Phase.BLIND_SELECTION);
+
+            case BlindOnGoing _ -> changePhase(Phase.IN_BLIND);
+
+            case GameOver _ -> changePhase(Phase.GAME_OVER);
+
+            case GameWon _ -> changePhase(Phase.GAME_OVER);
             default -> {}
         }
         emit(outcome);
@@ -109,15 +113,14 @@ public class GameController {
         if (views.isEmpty()) {
             throw new IllegalStateException("View must be assigned before starting the game.");
         }
-        emit(state.drawHand());
-        state.setPhase(GameState.Phase.MAIN_SCREEN);
+        
+        changePhase(Phase.MAIN_SCREEN);
     }
 
     private void initializeGame() {
         /*once the user request playing a game */
         /*displays blind selection */
-        state.setPhase(GameState.Phase.BLIND_SELECTION);
-        /*emit(PHASE_CHANGED_EVENT) */
+        changePhase(Phase.BLIND_SELECTION);
     }
 
     private void startBlind() {
@@ -125,9 +128,14 @@ public class GameController {
         /*Should initialize the blind */
         //TODO: this is only a test, should be replaced by the actual blind initialization logic
         emit(state.drawHand());
-        state.setPhase(GameState.Phase.IN_BLIND);
+        changePhase(Phase.IN_BLIND);
     }
 
     private void finishGame() {
+    }
+    
+    private void changePhase(Phase phase) {
+        state.setPhase(phase);
+        emit(new PhaseChange(phase));
     }
 }
