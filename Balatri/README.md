@@ -1,15 +1,16 @@
 Pour compiler le projet:
-```make build```
+```make build```  
 
-Pour run la version par défaut:
-```make run```
+Pour compiler et run la version par défaut:
+```make run```  
 
 Pour run le projet compilé avec des arguments:
-```java -cp "../lib/zen-6.0.jar:../bin" Main $args```
+```java -cp "../lib/zen-6.0.jar:../bin" Main $args```  
 
 arguments:
-    - console: Pour ne lancer que la vue console
-    - zen: Pour ne lancer que la vue zen
+
+    - console: Pour ne lancer que la vue console  
+    - zen: Pour ne lancer que la vue zen  
 
 
 Remaining Tasks:
@@ -22,15 +23,15 @@ Remaining Tasks:
 - Gérer toutes les erreurs (requireNonNull, exceptions)
 - Définir des blinds cohérents(valeurs actuelles = test) -> blindes infinis
 
-GameController:
-startBlind: this is only a test, should be replaced by the actual blind initialization logic
-onAction: shop
-onAction: calculate money won and apply jokers that execute on last hand
+GameController:  
+startBlind: this is only a test, should be replaced by the actual blind initialization logic  
+onAction: shop  
+onAction: calculate money won and apply jokers that execute on last hand   
 
-GameState.java:
-Line 57: if size is good select else message
-Line 70: appliquer les jokers qui s'executent avant
-Line 71: return a handresult with the handtype and the scoring cards
-Line 76: routine de scoring des cards et des jokers qui s'executent pendant
-Line 77: appliquer les jokers qui s'executent apres
-Line 109: saving the current state and game
+GameState.java:  
+Line 57: if size is good select else message  
+Line 70: appliquer les jokers qui s'executent avant  
+Line 71: return a handresult with the handtype and the scoring cards  
+Line 76: routine de scoring des cards et des jokers qui s'executent pendant  
+Line 77: appliquer les jokers qui s'executent apres  
+Line 109: saving the current state and game  
