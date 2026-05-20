@@ -24,8 +24,16 @@ public class GameController {
     public void addView(View view) {this.views.add(view);}
 
     public void launch() {
+
+        //Should replace launch(this, queueAction)
+        //By launch(this, () -> queueAction; processQueuedAction; )
         if (views.isEmpty()) {
             throw new IllegalStateException("A view must be assigned before launching the game.");
+        }
+        if(views.size() == 1){
+            views.getFirst().launch(this, (action, data) -> {
+                        queueAction(action, data); processQueuedActions();});
+            return;
         }
 
         // Launch non-GUI views in background threads.
@@ -33,7 +41,7 @@ public class GameController {
             switch (view) {
                 case Zen6View _ -> {} // Skip GUI views for now
                 case ConsoleView consoleView -> {
-                    Thread t = new Thread(() -> {consoleView.launch(this);}, "ViewLauncher-ConsoleView");
+                    Thread t = new Thread(() -> {consoleView.launch(this, this::queueAction);}, "ViewLauncher-ConsoleView");
                     t.setDaemon(false);
                     t.start();
                 }
@@ -44,7 +52,9 @@ public class GameController {
         for (View view : views) {
             switch(view){
                 case Zen6View zen6View -> {
-                    zen6View.launch(this);
+                    zen6View.launch(this, (action, data) -> {
+                        queueAction(action, data); processQueuedActions();}
+                    );
                     return;} //Stops at the first GUI view, we don't want to launch multiple GUI views
                 default -> {}
             }
@@ -59,7 +69,6 @@ public class GameController {
 
     public void queueAction(PlayerAction action, Object data) {
         actionQueue.offer(new PendingAction(action, data));
-        processQueuedActions();
     }
 
     public void processQueuedActions() {
@@ -75,7 +84,7 @@ public class GameController {
             case PLAY_HAND -> { playHand();}
             case DISCARD -> emit(state.onDiscard());
             case QUIT_GAME -> emit(state.onQuitGame());
-            case START_GAME -> initializeGame();
+            case START_GAME -> startGame();
             case SELECT_BLIND -> startBlind();
             /*TODO: add phase changes
             * case START_GAME -> initializeGame();

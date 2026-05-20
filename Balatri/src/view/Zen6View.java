@@ -8,6 +8,7 @@ import view.zen6.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -29,12 +30,15 @@ public final class Zen6View implements View {
 
     private UIHandContainer uiHandContainer = null;
 
+    BiConsumer<PlayerAction, Object> queueAction;
+
     public Zen6View(GameController controller) {
         this.controller = controller;
     }
 
     @Override
-    public void launch(GameController controller) {
+    public void launch(GameController controller, BiConsumer<PlayerAction, Object> queueAction) {
+        this.queueAction = queueAction;
         Application.run(Color.WHITE, context -> {
             this.context = context;
             buildMainMenu();
@@ -139,11 +143,11 @@ public final class Zen6View implements View {
         if (ke.action() != KeyboardEvent.Action.KEY_PRESSED) {return;}
         // maybe a switch ?
         if(ke.key() == KeyboardEvent.Key.Q){
-            controller.onAction(PlayerAction.QUIT_GAME, null);
+            this.queueAction.accept(PlayerAction.QUIT_GAME, null);
             context.dispose();
         }
         if(ke.key() == KeyboardEvent.Key.SPACE){
-            controller.onAction(PlayerAction.PLAY_HAND, null);
+            this.queueAction.accept(PlayerAction.PLAY_HAND, null);
             redraw();
         }
     }
@@ -154,7 +158,7 @@ public final class Zen6View implements View {
         UIObject clickedObject = getClickedObject(new Point(location.x(), location.y()));
         
         switch (clickedObject) {
-            case UICard uiCard -> controller.onAction(PlayerAction.CARD_CHOSE, uiCard.getCard());
+            case UICard uiCard -> this.queueAction.accept(PlayerAction.CARD_CHOSE, uiCard.getCard());
             case Button button -> button.onClick(controller);
             case UIRectangle _, UIHandContainer _ -> {}
             case null -> {}

@@ -7,19 +7,23 @@ import model.GameState;
 import model.Phase;
 
 import java.util.Scanner;
+import java.util.function.BiConsumer;
+
 import controller.GameController;
 
 public final class ConsoleView implements View {
 
     private final GameController controller;
     private volatile boolean running = true;
+    BiConsumer<PlayerAction, Object> queueAction;
 
     public ConsoleView(GameController controller) {
         this.controller = controller;
     }
 
     @Override
-    public void launch(GameController controller) {
+    public void launch(GameController controller, BiConsumer<PlayerAction, Object> queueAction) {
+        this.queueAction = queueAction;
         this.running = true;
 
         try (Scanner scanner = new Scanner(System.in)) {
@@ -50,12 +54,12 @@ public final class ConsoleView implements View {
 
     private void processInput(String input) {
         switch(input.trim().toUpperCase()) { //Needs to check for current phase to accept input :/
-            case "M" -> controller.startGame();
-            case "L" -> controller.queueAction(PlayerAction.SELECT_BLIND, null);
-            case "P" -> controller.queueAction(PlayerAction.PLAY_HAND, null);
-            case "D" -> controller.queueAction(PlayerAction.DISCARD, null);
+            case "M" -> this.queueAction.accept(PlayerAction.START_GAME, null);
+            case "L" -> this.queueAction.accept(PlayerAction.SELECT_BLIND, null);
+            case "P" -> this.queueAction.accept(PlayerAction.PLAY_HAND, null);
+            case "D" -> this.queueAction.accept(PlayerAction.DISCARD, null);
             case "Q" -> {
-                controller.queueAction(PlayerAction.QUIT_GAME, null);
+                this.queueAction.accept(PlayerAction.QUIT_GAME, null);
                 running = false;
             }
             default  -> {
@@ -66,7 +70,7 @@ public final class ConsoleView implements View {
                         IO.println("Entree invalide ! Tape un chiffre entre 0 et " + (hand.size() - 1) + ", P, D ou Q.");
                     } else {
                         Card card = hand.get(index);
-                        controller.queueAction(PlayerAction.CARD_CHOSE, card);
+                        this.queueAction.accept(PlayerAction.CARD_CHOSE, card);
                     }
                 } catch (NumberFormatException e) {
                     IO.println("Entree invalide ! Tape un chiffre entre 0 et " + (controller.getState().getCurrentBlind().getHand().getMaxSize() - 1) + ", P, D ou Q.");
