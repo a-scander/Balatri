@@ -7,5 +7,6 @@ public enum PlayerAction {
     DISCARD,
     QUIT_GAME,
     START_GAME,
-    SELECT_BLIND
+    SELECT_BLIND,
+    BLIND_SELECTION
 }

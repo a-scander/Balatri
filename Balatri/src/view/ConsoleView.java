@@ -49,12 +49,13 @@ public final class ConsoleView implements View {
             case GameOver _        -> onGameOver();
             case GameWon _         -> onGameWon();
             case PhaseChange pc    -> processPhaseChange(pc.phase());
+            case GameClosed _      -> {IO.println("Game closed."); running = false;}
         }
     }
 
     private void processInput(String input) {
         switch(input.trim().toUpperCase()) { //Needs to check for current phase to accept input :/
-            case "M" -> this.queueAction.accept(PlayerAction.START_GAME, null);
+            case "M" -> this.queueAction.accept(PlayerAction.BLIND_SELECTION, null);
             case "L" -> this.queueAction.accept(PlayerAction.SELECT_BLIND, null);
             case "P" -> this.queueAction.accept(PlayerAction.PLAY_HAND, null);
             case "D" -> this.queueAction.accept(PlayerAction.DISCARD, null);
@@ -146,13 +147,11 @@ public final class ConsoleView implements View {
     private void onGameOver() {
         displaySeparator();
         IO.println("GAME OVER");
-        running = false;
     }
 
     private void onGameWon() {
         displaySeparator();
         IO.println("VICTOIRE");
-        running = false;
     }
 
     private void displayMainScreen() {

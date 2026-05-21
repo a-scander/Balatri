@@ -83,9 +83,11 @@ public class GameController {
             case CARD_CHOSE -> { emit(state.selectCard((Card) data));}
             case PLAY_HAND -> { playHand();}
             case DISCARD -> emit(state.onDiscard());
-            case QUIT_GAME -> emit(state.onQuitGame());
+            /*TODO : saving the current state and game in the controller*/
+            case QUIT_GAME -> emit(new GameClosed());
             case START_GAME -> startGame();
             case SELECT_BLIND -> startBlind();
+            case BLIND_SELECTION -> initializeGame();
             /*TODO: add phase changes
             * case START_GAME -> initializeGame();
             * case BLIND_SELECTED -> startBlind();
@@ -119,7 +121,7 @@ public class GameController {
 
     public void startGame() {
         this.state = new GameState();
-        changePhase(Phase.BLIND_SELECTION);
+        changePhase(Phase.MAIN_SCREEN);
     }
 
     private void initializeGame() {

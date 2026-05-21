@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import domain.*;
@@ -23,8 +24,8 @@ public class GameState {
 		/* Test values */
 		this.blinds = new Blind[] {
 			new Blind("Small Blind", BlindType.SMALL_BLIND, 30),
-			new Blind("Big Blind",   BlindType.BIG_BLIND,   60) 
-			// new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
+			new Blind("Big Blind",   BlindType.BIG_BLIND,   60),
+			new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
 		};
 		this.blindIndex = 0;
 		this.currentBlind = blinds[blindIndex];
@@ -37,6 +38,7 @@ public class GameState {
 	public Phase getPhase()					{ return phase; }
 	public void setPhase(Phase phase)		{ this.phase = phase; }
 	public GameEvent drawHand()				{ return new HandDrawn(currentBlind.drawHand()); }
+	public List<Blind> getBlinds()			{ return List.of(blinds); }
 
 	public GameEvent selectCard(Card card) {
 		//TODO: if size is good select else message
@@ -93,7 +95,6 @@ public class GameState {
 	}
 
     public GameEvent onQuitGame() {
-        //TODO : saving the current state and game in the controller
 		return new GameOver();
     }
 }
