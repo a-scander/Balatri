@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import controller.GameController;
 
+//TODO: Make button take the queueAction function instead of the full Consumer<controller>, check for use case for at commit b6c24df6951019597ae456d54c26453247623c5c every button is convertible
 public record Button(Consumer<GameController> action, String name, int x, int y, int width, int height, int zDepth) implements UIObject {
     public void onClick(GameController controller){
         action.accept(controller);

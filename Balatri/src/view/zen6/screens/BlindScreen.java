@@ -3,11 +3,20 @@ package view.zen6.screens;
 import event.InputEvent.PlayerAction;
 import model.GameState;
 import view.zen6.Button;
+import view.zen6.InfoMenu;
 import view.zen6.UIHandContainer;
 
 public class BlindScreen extends UIScreen {
     public Button quitButton;
-    public UIHandContainer uiHandContainer;
+    public UIHandContainer uiHandContainer;// TODO: add the sort buttons and play and discard button to the UIHandContainer class 
+
+    public InfoMenu infoMenu; //Remember to refresh on state change and on HandChangEvent
+    
+    //public UIDeck uiDeck; //with a deckMenu (to display the whole deck with or whithout discard)
+
+    //public ConsumableContainer comsumableContainer;
+
+    //public JokerContainer jokerContainer;
 
     public BlindScreen(GameState state){
         super(0);
@@ -19,7 +28,7 @@ public class BlindScreen extends UIScreen {
         getUIObjects().add(this.uiHandContainer);
     
         var playButton = new Button(
-            (ctrl) -> ctrl.onAction(PlayerAction.PLAY_HAND, null), "playhand" ,
+            (ctrl) -> ctrl.queueAction(PlayerAction.PLAY_HAND, null), "playhand" ,
             20, 420, 200, 50, 1
         );
 

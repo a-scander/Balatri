@@ -24,7 +24,7 @@ public final class UIBlind implements UIObject {
         this.height = height;
         this.zDepth = zDepth;
         this.blind = blind;
-        this.selectButton = isCurrent ? new Button((ctrl) -> ctrl.onAction(event.InputEvent.PlayerAction.SELECT_BLIND, blind), 
+        this.selectButton = isCurrent ? new Button((ctrl) -> ctrl.queueAction(event.InputEvent.PlayerAction.SELECT_BLIND, blind), 
                                                     "Current Blind", x + 10, y + height / 2, width - 20, height / 4, zDepth + 1)
                                         : new Button((ctrl) -> {}, 
                                                 "Upcoming", x + width / 4, y + height / 2, width / 2, height / 4, zDepth + 1);

@@ -27,8 +27,8 @@ public class GameState {
 			new Blind("Big Blind",   BlindType.BIG_BLIND,   60),
 			new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
 		};
-		this.blindIndex = 0;
-		this.currentBlind = blinds[blindIndex];
+		this.blindIndex = 0;//Math.MIN
+		this.currentBlind = blinds[blindIndex]; //this is not to do at initialization but at blind_selection event call should be null
 		this.phase = Phase.INITIALIZE;
 	}
 

@@ -26,7 +26,6 @@ Remaining Tasks:
 
 - Les jokers -> trois phases d'évaluation de la main
 - Les extensions(extension 2 Fait !)
-- Traduire tous les messages console en anglais
 - Remplacer toutes les valeurs brutes par des constantes
 - Ajouter des commentaires sur toutes les classes et méthodes
 - Gérer toutes les erreurs (requireNonNull, exceptions)

@@ -17,7 +17,7 @@ public class EndScreen extends UIScreen{
         int X = si.width()/2 - width/2;
         int Y = si.height()/2 - height/2;
 
-        var playButton = new Button((ctrl) -> ctrl.startGame(), message ,X, Y, width ,height, 1);
+        var playButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.START_GAME, null), message ,X, Y, width ,height, 1); //conteext isn't initialize on first screen
         this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 0, 100, 100, 10);
 
         getUIObjects().add(playButton);

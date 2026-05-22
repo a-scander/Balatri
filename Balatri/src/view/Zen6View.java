@@ -36,7 +36,7 @@ public final class Zen6View implements View {
     public void launch(GameController controller, BiConsumer<PlayerAction, Object> queueAction) {
         this.queueAction = queueAction;
         this.screen = new MainScreen(null);
-        controller.queueAction(PlayerAction.START_GAME, null);
+        queueAction.accept(PlayerAction.START_GAME, null);
         Application.run(Color.WHITE, context -> {
             this.context = context;
             redraw();
@@ -66,7 +66,7 @@ public final class Zen6View implements View {
         switch(screen){
             case BlindScreen BScreen -> {
                 switch(event){
-                    case HandPlayed hp -> {
+                    case HandPlayed hp -> { //let the warning it's for when cards will score individually
                         GameState state = controller.getState();
                         List<Card> cards = Stream.concat(
                             state.getCurrentBlind().getHand().getCards().stream(),
@@ -136,7 +136,7 @@ public final class Zen6View implements View {
         switch (clickedObject) {
             case UICard uiCard -> this.queueAction.accept(PlayerAction.CARD_CHOSE, uiCard.getCard());
             case Button button -> button.onClick(controller);
-            case UIRectangle _, UIHandContainer _, UIBlind _-> {}
+            case UIRectangle _, UIHandContainer _, UIBlind _, InfoMenu _-> {}
             case null -> {}
         }
         redraw();

@@ -68,13 +68,13 @@ public final class ConsoleView implements View {
                     int index = Integer.parseInt(input);
                     var hand = controller.getState().getCurrentBlind().getHand().getCards();
                     if (index < 0 || index >= hand.size()) {
-                        IO.println("Entree invalide ! Tape un chiffre entre 0 et " + (hand.size() - 1) + ", P, D ou Q.");
+                        IO.println("Wrong input ! Enter a number between 0 and " + (hand.size() - 1) + ", P, D or Q.");
                     } else {
                         Card card = hand.get(index);
                         this.queueAction.accept(PlayerAction.CARD_CHOSE, card);
                     }
                 } catch (NumberFormatException e) {
-                    IO.println("Entree invalide ! Tape un chiffre entre 0 et " + (controller.getState().getCurrentBlind().getHand().getMaxSize() - 1) + ", P, D ou Q.");
+                    IO.println("Wrong input ! Enter a number between 0 and " + (controller.getState().getCurrentBlind().getHand().getMaxSize() - 1) + ", P, D or Q.");
                 }
             }
         }
@@ -98,13 +98,13 @@ public final class ConsoleView implements View {
         GameState state = controller.getState();
         IO.println("=== " + state.getCurrentBlind().getName() + " ===");
         IO.println("Score : " + state.getCurrentBlind().getScore() + " / " + state.getCurrentBlind().getTargetScore());
-        IO.println("Mains restantes : " + state.getCurrentBlind().getHandsCurrent());
-        IO.println("Defausses restantes : " + state.getCurrentBlind().getDiscardCurrent());
+        IO.println("Remaining hands : " + state.getCurrentBlind().getHandsCurrent());
+        IO.println("Remaining discards : " + state.getCurrentBlind().getDiscardCurrent());
     }
 
     private void displayHand() {
         GameState state = controller.getState();
-        IO.println("\nTa main " + state.getCurrentBlind().getHand().getCards().size() + ":");
+        IO.println("\nYour hand " + state.getCurrentBlind().getHand().getCards().size() + ":");
         for (int i = 0; i < state.getCurrentBlind().getHand().getCards().size(); i++) {
             IO.println("[" + i + "] " + state.getCurrentBlind().getHand().getCards().get(i));
         }
@@ -112,7 +112,7 @@ public final class ConsoleView implements View {
 
     private void displaySelection() {
         GameState state = controller.getState();
-        IO.println("\nCartes selectionnees : " + state.getCurrentBlind().getSelectedCards().size() + "/5");
+        IO.println("\nSelected cards : " + state.getCurrentBlind().getSelectedCards().size() + "/5");
         for (Card card : state.getCurrentBlind().getSelectedCards()) {
             IO.println("- " + card);
         }
@@ -140,7 +140,7 @@ public final class ConsoleView implements View {
 
     private void onBlindBeaten() {
         displaySeparator();
-        IO.println("Blind battue !");
+        IO.println("Blind beaten !");
         /*display blind selection */
     }
 
@@ -151,7 +151,7 @@ public final class ConsoleView implements View {
 
     private void onGameWon() {
         displaySeparator();
-        IO.println("VICTOIRE");
+        IO.println("VICTORY");
     }
 
     private void displayMainScreen() {

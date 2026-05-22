@@ -6,15 +6,21 @@ import domain.Blind;
 import event.InputEvent.PlayerAction;
 import model.GameState;
 import view.zen6.Button;
-
+import view.zen6.InfoMenu;
 import view.zen6.UIBlind;
 
 public class BlindSelectionScreen extends UIScreen {
-    public Button quitButton;
+    public Button quitButton; //TODO: remove once infoMenu is set
+
+    public InfoMenu infoMenu;
+    
+    //public UIDeck uiDeck;
+
+    //public ConsumableContainer comsumableContainer;
 
     //public JokerContainer jokerContainer;
 
-    public List<UIBlind> UIblinds = new java.util.ArrayList<>();
+    public List<UIBlind> UIblinds = new java.util.ArrayList<>(); //Should be constant to size 3
 
     public BlindSelectionScreen(GameState state) {
         super(0);
