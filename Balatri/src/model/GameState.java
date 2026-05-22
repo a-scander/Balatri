@@ -52,13 +52,10 @@ public class GameState {
 		}
 		//TODO: appliquer les jokers qui s'executent avant
 		HandType handType = HandEvaluator.evaluate(currentBlind.getSelectedCards()); // TODO : return a handresult with the handtype and the scoring cards
-		Planet planet = Planet.fromHandType(handType);
-		int nbTimesObtained = planetsObtained.getOrDefault(planet, 0);
-		int chips = handType.getBaseChips() + planet.getBonusChips() * nbTimesObtained;
-		int mult = handType.getBaseMult() + planet.getBonusMult() * nbTimesObtained;
+		Score newScore = getModifiedHandTypeValue(handType);
 		//TODO : routine de scoring des cards et des jokers qui s'executent pendant
 		//TODO : appliquer les jokers qui s"executent apres
-		int score =  chips * mult;
+		int score =  newScore.total();
 		var discardedCards = new ArrayList<>(currentBlind.getSelectedCards());
 		currentBlind.playHand(score);
 
@@ -97,4 +94,13 @@ public class GameState {
     public GameEvent onQuitGame() {
 		return new GameOver();
     }
+
+	public Score getModifiedHandTypeValue(HandType handType){
+		Planet planet = Planet.fromHandType(handType);
+		int nbTimesObtained = planetsObtained.getOrDefault(planet, 0);
+		Score baseScore = handType.getScore();
+		Score planetScoreMod = planet.getScore();
+		return new Score(baseScore.chips() + planetScoreMod.chips() * nbTimesObtained, 
+									baseScore.mult() + planetScoreMod.mult() * nbTimesObtained);
+	}
 }

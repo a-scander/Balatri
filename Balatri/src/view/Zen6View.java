@@ -136,7 +136,7 @@ public final class Zen6View implements View {
         switch (clickedObject) {
             case UICard uiCard -> this.queueAction.accept(PlayerAction.CARD_CHOSE, uiCard.getCard());
             case Button button -> button.onClick(controller);
-            case UIRectangle _, UIHandContainer _, UIBlind _, InfoMenu _-> {}
+            case UIRectangle _, UIHandContainer _, UIBlind _, InfoMenu _, BlindDescriptor _-> {}
             case null -> {}
         }
         redraw();

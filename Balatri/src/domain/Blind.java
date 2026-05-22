@@ -46,6 +46,7 @@ public class Blind {
     public Hand getHand()                   { return hand;}
     public int getTargetScore()             { return targetScore;}
     public boolean blindIsLost()            { return handsCurrent >= handsPerBlind && score < targetScore;}
+    public BlindType getType()              { return type;}
 
 
     public GameEvent selectCard(Card card) {

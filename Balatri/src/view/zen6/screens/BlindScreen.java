@@ -22,14 +22,23 @@ public class BlindScreen extends UIScreen {
         super(0);
 
         this.uiHandContainer = new UIHandContainer(
-            20, 200, 1000, 200, 0
+            600, 400, 1000, 200, 0
         );
     
         getUIObjects().add(this.uiHandContainer);
+
+        this.infoMenu = new InfoMenu(
+            40,     // x
+            40,     // y
+            500,    // width
+            420,    // height
+            5,
+            state
+        );
     
         var playButton = new Button(
             (ctrl) -> ctrl.queueAction(PlayerAction.PLAY_HAND, null), "playhand" ,
-            20, 420, 200, 50, 1
+            600, 610, 200, 50, 1
         );
 
         this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 100, 100, 100, 10);
@@ -44,6 +53,11 @@ public class BlindScreen extends UIScreen {
 
         this.quitButton = blindSelectionScreen.quitButton;
         getUIObjects().add(this.quitButton);
+
+        this.infoMenu = blindSelectionScreen.infoMenu;
+        getUIObjects().add(infoMenu);
+        getUIObjects().addAll(infoMenu.getObjects());
+
 
         /*if(blindScreen.jokerContainer != null){
             jokerContainer = blindScreen.jokerContainer;
@@ -62,6 +76,8 @@ public class BlindScreen extends UIScreen {
             default -> {
                 BlindScreen newScreen = new BlindScreen(state);
                 newScreen.getUIObjects().add(newScreen.quitButton);
+                newScreen.getUIObjects().add(newScreen.infoMenu);
+                newScreen.getUIObjects().addAll(newScreen.infoMenu.getObjects());
                 yield newScreen;}
         };
     }

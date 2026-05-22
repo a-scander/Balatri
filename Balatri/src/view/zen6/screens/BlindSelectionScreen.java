@@ -27,12 +27,21 @@ public class BlindSelectionScreen extends UIScreen {
     
         this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 100, 100, 100, 10);
 
+        this.infoMenu = new InfoMenu(
+            40,     // x
+            40,     // y
+            500,    // width
+            420,    // height
+            5,
+            state
+        );
+
         var blinds = state.getBlinds();
         
         for(int i = 0; i < blinds.size(); i++){
             Blind blind = blinds.get(i);
             int y = blind == state.getCurrentBlind() ? 300 : 320;
-            var UIblind = new UIBlind(400 + i * 100, y, 80, 200, 1, blinds.get(i), blind == state.getCurrentBlind());
+            var UIblind = new UIBlind(700 + i * 110, y, 100, 220, 1, blinds.get(i), blind == state.getCurrentBlind());
             this.UIblinds.add(UIblind);
             getUIObjects().add(UIblind);
             getUIObjects().add(UIblind.selectButton);
@@ -60,6 +69,10 @@ public class BlindSelectionScreen extends UIScreen {
         this.quitButton = blindScreen.quitButton;
         getUIObjects().add(this.quitButton);
 
+        this.infoMenu = blindScreen.infoMenu;
+        getUIObjects().add(infoMenu);
+        getUIObjects().addAll(infoMenu.getObjects());
+
         /*if(blindScreen.jokerContainer != null){
             jokerContainer = blindScreen.jokerContainer;
         }*/
@@ -78,6 +91,8 @@ public class BlindSelectionScreen extends UIScreen {
             default -> {
                 BlindSelectionScreen newScreen = new BlindSelectionScreen(state);
                 newScreen.getUIObjects().add(newScreen.quitButton);
+                newScreen.getUIObjects().add(newScreen.infoMenu);
+                newScreen.getUIObjects().addAll(newScreen.infoMenu.getObjects());
                 yield newScreen;}
         };
     }

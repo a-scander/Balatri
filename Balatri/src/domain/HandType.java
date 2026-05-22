@@ -11,14 +11,11 @@ public enum HandType {
     FOUR_OF_A_KIND(60, 7),
     STRAIGHT_FLUSH(100, 8);
 
-    private final int baseChips;
-    private final int baseMult;
+    private final Score score;
 
     HandType(int baseChips, int baseMult) {
-        this.baseChips = baseChips;
-        this.baseMult = baseMult;
+        this.score = new Score(baseChips, baseMult);
     }
 
-    public int getBaseChips() { return baseChips; }
-    public int getBaseMult()  { return baseMult;  }
+    public Score getScore(){ return this.score;}
 }

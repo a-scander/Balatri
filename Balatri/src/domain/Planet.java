@@ -15,18 +15,15 @@ public enum Planet {
     /* Easy to add the hidden planets ;P */
 
     private final HandType targetHand;
-    private final int bonusChips;
-    private final int bonusMult;
+    private final Score score;
 
     Planet(HandType targetHand, int bonusChips, int bonusMult) {
         this.targetHand = targetHand;
-        this.bonusChips = bonusChips;
-        this.bonusMult  = bonusMult;
+        this.score = new Score(bonusChips, bonusMult);
     }
 
     public HandType getTargetHand() { return targetHand; }
-    public int getBonusChips()      { return bonusChips; }
-    public int getBonusMult()       { return bonusMult;  }
+    public Score getScore() { return score;}
 
     public static Planet fromHandType(HandType handType) {
         for (Planet planet : values()) {

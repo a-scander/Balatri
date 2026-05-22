@@ -2,7 +2,7 @@ package view.zen6;
 
 import java.awt.Graphics2D;
 
-public sealed interface UIObject permits UICard, Button, UIRectangle, UIHandContainer, UIBlind, InfoMenu {
+public sealed interface UIObject permits UICard, Button, UIRectangle, UIHandContainer, UIBlind, InfoMenu, BlindDescriptor {
     public Bounds getBounds();
     
     public int zDepth();
