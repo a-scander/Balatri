@@ -12,14 +12,13 @@ import view.zen6.UIObject;
 
 public class UIScreen{
     private final List<UIObject> uiObjects = new ArrayList<>();
-    private int zDepth;
 
     public List<UIObject> getUIObjects(){return uiObjects;}
 
-    public UIScreen(int zDepth){
-        this.zDepth = zDepth;
-    }
+    public UIScreen(){}
 
+
+    //Maybe do static classes to be able to turn UIScreen into an interface
     public void render(Graphics2D graphics){
         for(var obj : uiObjects){
             obj.draw(graphics);

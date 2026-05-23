@@ -27,6 +27,11 @@ public class GameState {
 			new Blind("Big Blind",   BlindType.BIG_BLIND,   60),
 			new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
 		};
+
+		for (var planet : Planet.values()) {
+            planetsObtained.put(planet, 0);
+        }
+
 		this.blindIndex = 0;//Math.MIN
 		this.currentBlind = blinds[blindIndex]; //this is not to do at initialization but at blind_selection event call should be null
 		this.phase = Phase.INITIALIZE;
@@ -47,11 +52,8 @@ public class GameState {
 	}
 
 	public GameEvent onPlayHand() {
-		if (currentBlind.getSelectedCards().isEmpty()) {
-			return null;
-		}
-		//TODO: appliquer les jokers qui s'executent avant
-		HandType handType = HandEvaluator.evaluate(currentBlind.getSelectedCards()); // TODO : return a handresult with the handtype and the scoring cards
+		HandType handType = getSelectedHandType();
+		if(handType == null)return null;
 		Score newScore = getModifiedHandTypeValue(handType);
 		//TODO : routine de scoring des cards et des jokers qui s'executent pendant
 		//TODO : appliquer les jokers qui s"executent apres
@@ -62,6 +64,11 @@ public class GameState {
 		//DEBUG: 
 		IO.println("Hand played: " + handType + " for " + score + " points. Total score: " + currentBlind.getScore());
 		return new HandPlayed(score, handType, discardedCards, currentBlind.drawHand());
+	}
+
+	public HandType getSelectedHandType(){
+		//TODO: appliquer les jokers qui s'executent avant
+		return HandEvaluator.evaluate(currentBlind.getSelectedCards()); // TODO : return a handresult with the handtype and the scoring cards
 	}
 
 	public GameEvent checkOutcome() {
@@ -97,10 +104,16 @@ public class GameState {
 
 	public Score getModifiedHandTypeValue(HandType handType){
 		Planet planet = Planet.fromHandType(handType);
-		int nbTimesObtained = planetsObtained.getOrDefault(planet, 0);
+		//if(handType == null)return new Score(0, 0);
+		int nbTimesObtained = planetsObtained.get(planet);
 		Score baseScore = handType.getScore();
 		Score planetScoreMod = planet.getScore();
 		return new Score(baseScore.chips() + planetScoreMod.chips() * nbTimesObtained, 
 									baseScore.mult() + planetScoreMod.mult() * nbTimesObtained);
+	}
+
+	public int getHandLevel(HandType handType){
+		Planet planet = Planet.fromHandType(handType);
+		return planetsObtained.get(planet) + 1;
 	}
 }

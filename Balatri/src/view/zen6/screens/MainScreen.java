@@ -10,7 +10,6 @@ public final class MainScreen extends UIScreen {
     public Button quitButton = null;
 
     public MainScreen(ApplicationContext context){
-        super(0);
         getUIObjects().clear();
         int X = 10, Y = 10;
         int width = 250, height = 80;

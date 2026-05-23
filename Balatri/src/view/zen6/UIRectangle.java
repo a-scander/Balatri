@@ -4,7 +4,33 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 
-public record UIRectangle(String text,  int x, int y, int width, int height, int zDepth) implements UIObject {
+public final class UIRectangle implements UIObject {
+    public String text;
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+    public int zDepth;
+
+    public UIRectangle(String text,  int x, int y, int width, int height, int zDepth){
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.zDepth = zDepth;
+    }
+
+    public String text(){return this.text;}
+    public int x(){return x;}
+    public int y(){return y;}
+    public int width(){return width;}
+    public int height(){return height;}
+    public int zDepth(){return zDepth;}
+
+    public void setText(String text){this.text = text;}
+
+
     @Override
     public Bounds getBounds() {
         return new Bounds(x, y, width, height);

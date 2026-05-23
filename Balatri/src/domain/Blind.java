@@ -47,13 +47,16 @@ public class Blind {
     public int getTargetScore()             { return targetScore;}
     public boolean blindIsLost()            { return handsCurrent >= handsPerBlind && score < targetScore;}
     public BlindType getType()              { return type;}
-
+    public int getHandPerBlind(){return handsPerBlind;}
+    public int getDiscardPerBlind(){return discardPerBlind;}
+    public int getRemainingHandNb(){return handsPerBlind - handsCurrent;}
+    public int getRemainingDiscardNb(){return discardPerBlind - discardCurrent;}
 
     public GameEvent selectCard(Card card) {
         if (selectedCards.contains(card)) {
             selectedCards.remove(card);
             hand.getCards().add(card);
-            return new CardUnselected(List.of(card)); // Maybe List.of is Overkilled but else more complex in classes inheritace so loose/loose
+            return new CardUnselected(List.of(card)); // Maybe List.of is Overkilled but otherwise more complex in classes inheritace so loose/loose
         }
         if(selectedCards.size() > 4)return new CardSelected(null);
 

@@ -21,29 +21,24 @@ public final class InfoMenu implements UIObject {
 
     public BlindDescriptor blindDescriptor;
 
+    public HandDescriptor currentSelectedHand;
     public UIRectangle currentScore;
-
-    public UIRectangle chipDisplay;
-    public UIRectangle multDisplay;
 
     public UIRectangle remainingHands;
     public UIRectangle remainingDiscards;
 
     public UIRectangle moneyDisplay;
 
-    public InfoMenu(
-            int x,
-            int y,
-            int width,
-            int height,
-            int zDepth,
-            GameState state
-    ) {
+    public InfoMenu(int x, int y, int width, int height, int zDepth, GameState state) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.zDepth = zDepth;
+
+        int padding = 20;
+
+        int ColumnWidth = (width - padding * 3) / 2;
 
         Blind currentBlind = state.getCurrentBlind();
 
@@ -56,48 +51,40 @@ public final class InfoMenu implements UIObject {
             return;
         }
 
-        int padding = 20;
+        int currentHeight = 80;
+        int currentY = y + padding;
 
-        int leftColumnWidth = width / 2 - padding;
-        int rightColumnWidth = width / 2 - padding;
+        this.blindDescriptor = new BlindDescriptor(currentBlind, x + padding, currentY, width - padding, currentHeight, zDepth + 1);
 
-        this.blindDescriptor = new BlindDescriptor(currentBlind, x + padding, y + padding, leftColumnWidth, 140, zDepth + 1);
+        currentY += currentHeight + padding * 1.5;
+        currentHeight = 100;
+        
+        HandType handType = state.getSelectedHandType();
+        String level = "";
+        Score handScore = new Score(0, 0);
+        if(handType != null){
+            handScore = state.getModifiedHandTypeValue(handType);
+            level += state.getHandLevel(handType);
+        }
 
-        this.currentScore = new UIRectangle("Score : " + currentBlind.getScore(), x + padding, y + 180, leftColumnWidth, 60, zDepth + 1);
+        this.currentSelectedHand = new HandDescriptor(x + padding, currentY, width - padding * 2, currentHeight, zDepth + 1, handType, level, handScore);
 
-        HandType handType = HandType.HIGH_CARD;
-        Score score = state.getModifiedHandTypeValue(handType);
+        currentY += currentHeight + padding;
+        currentHeight = 40;
 
-        int rightX = x + width / 2;
+        this.currentScore = new UIRectangle("" + currentBlind.getScore(), x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
 
-        this.chipDisplay = new UIRectangle("Chips : " + score.chips(), rightX, y + padding, rightColumnWidth, 60, zDepth + 1);
+        currentY += currentHeight + padding / 2;
 
-        this.multDisplay = new UIRectangle("Mult : " + score.mult(), rightX, y + 90, rightColumnWidth, 60, zDepth + 1);
+        this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getRemainingHandNb()), x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
 
-        this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getHandsCurrent()), 
-                rightX,
-                y + 180,
-                rightColumnWidth,
-                50,
-                zDepth + 1
-                
-        );
+        currentY += currentHeight + padding / 2;
 
-        this.remainingDiscards = new UIRectangle("Discards : " + (4 - currentBlind.getDiscardCurrent()), 
-                rightX,
-                y + 250,
-                rightColumnWidth,
-                50,
-                zDepth + 1
-                
-        );
+        this.remainingDiscards = new UIRectangle("Discards : " + (4 - currentBlind.getRemainingDiscardNb()), x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
 
-        this.moneyDisplay = new UIRectangle("$ "/* + state.getMoney()*/, x + padding,
-                y + height - 70,
-                width - padding * 2,
-                50,
-                zDepth + 1
-        );
+        currentY += currentHeight + padding;
+
+        this.moneyDisplay = new UIRectangle("$ "/* + state.getMoney()*/, x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
     }
 
     @Override
@@ -128,16 +115,9 @@ public final class InfoMenu implements UIObject {
             objects.addAll(blindDescriptor.getObjects());
         }
 
-        if(currentScore != null) {
-            objects.add(currentScore);
-        }
-
-        if(chipDisplay != null) {
-            objects.add(chipDisplay);
-        }
-
-        if(multDisplay != null) {
-            objects.add(multDisplay);
+        if(currentSelectedHand != null) {
+            objects.add(currentSelectedHand);
+            objects.addAll(currentSelectedHand.getObjects());
         }
 
         if(remainingHands != null) {
@@ -154,4 +134,40 @@ public final class InfoMenu implements UIObject {
 
         return objects;
     }
+
+    public void refresh(GameState state){
+        BlindChanged(state.getCurrentBlind());
+
+        onChangedHand(state);
+        moneyChanged(0);//TODO: change that 
+    }
+
+    public void BlindChanged(Blind blind){
+        this.blindDescriptor.refresh(blind);
+        
+        this.remainingHands.setText("Hands" + blind.getRemainingHandNb());
+        this.remainingDiscards.setText("Discards" + blind.getRemainingDiscardNb());
+    }
+
+    public void onChangedHand(GameState state){
+        Blind currentBlind = state.getCurrentBlind();
+        HandType handType = state.getSelectedHandType();
+
+        Score handScore = new Score(0, 0);
+        String level = "";
+        if(handType != null){
+            handScore = state.getModifiedHandTypeValue(handType);
+            level += state.getHandLevel(handType);
+
+        }
+
+        currentSelectedHand.refresh(handType, level, handScore);
+        
+        this.currentScore.setText("Score: " + currentBlind.getScore());
+    }
+
+    public void moneyChanged(int newAmount){
+        this.moneyDisplay.setText("" + newAmount);
+    }
+
 }

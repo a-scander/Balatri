@@ -10,8 +10,6 @@ public class EndScreen extends UIScreen{
     private Button quitButton;
 
     public EndScreen(ApplicationContext context, String message) {
-        super(0);
-
         int width = 250, height = 80;
         ScreenInfo si = context.getScreenInfo();
         int X = si.width()/2 - width/2;

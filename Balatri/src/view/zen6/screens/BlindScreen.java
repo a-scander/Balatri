@@ -19,22 +19,13 @@ public class BlindScreen extends UIScreen {
     //public JokerContainer jokerContainer;
 
     public BlindScreen(GameState state){
-        super(0);
-
         this.uiHandContainer = new UIHandContainer(
             600, 400, 1000, 200, 0
         );
     
         getUIObjects().add(this.uiHandContainer);
 
-        this.infoMenu = new InfoMenu(
-            40,     // x
-            40,     // y
-            500,    // width
-            420,    // height
-            5,
-            state
-        );
+        this.infoMenu = new InfoMenu(40, 40, 500, 420, 5, state);
     
         var playButton = new Button(
             (ctrl) -> ctrl.queueAction(PlayerAction.PLAY_HAND, null), "playhand" ,

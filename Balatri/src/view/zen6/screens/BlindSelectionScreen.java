@@ -23,18 +23,9 @@ public class BlindSelectionScreen extends UIScreen {
     public List<UIBlind> UIblinds = new java.util.ArrayList<>(); //Should be constant to size 3
 
     public BlindSelectionScreen(GameState state) {
-        super(0);
-    
         this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 100, 100, 100, 10);
 
-        this.infoMenu = new InfoMenu(
-            40,     // x
-            40,     // y
-            500,    // width
-            420,    // height
-            5,
-            state
-        );
+        this.infoMenu = new InfoMenu(80, 300, 500, 420, 5, state);
 
         var blinds = state.getBlinds();
         

@@ -72,12 +72,30 @@ public final class Zen6View implements View {
                             state.getCurrentBlind().getHand().getCards().stream(),
                             state.getCurrentBlind().getSelectedCards().stream()).toList();
                         BScreen.getUiHandContainer().refreshHand(cards);
-                    }
-                    case CardUnselected us -> {BScreen.getUiHandContainer().selectCards(us.changedCards(), false);}
-                    case CardSelected cs -> {if(cs.changedCards() == null){break;}BScreen.getUiHandContainer().selectCards(cs.changedCards(), true);}
-                    case HandDrawn hd -> {BScreen.getUiHandContainer().addCards(hd.changedCards());}
-                    case HandDiscarded hd -> {BScreen.getUiHandContainer().removeCards(hd.changedCards());} 
-                }   
+                        BScreen.infoMenu.refresh(state);
+                        }
+
+                    case CardUnselected us -> {
+                        BScreen.getUiHandContainer().selectCards(us.changedCards(), false);
+                        BScreen.infoMenu.onChangedHand(controller.getState());
+                        }
+
+                    case CardSelected cs -> {
+                        if(cs.changedCards() == null)break;
+                        BScreen.getUiHandContainer().selectCards(cs.changedCards(), true);
+                        BScreen.infoMenu.onChangedHand(controller.getState());
+                        }
+
+                    case HandDrawn hd -> {
+                        BScreen.getUiHandContainer().addCards(hd.changedCards());
+                        }
+
+                    case HandDiscarded hd -> {
+                        BScreen.getUiHandContainer().removeCards(hd.changedCards());
+                        BScreen.infoMenu.BlindChanged(controller.getState().getCurrentBlind());
+                        }
+
+                }
             }
             default -> {return;}
         }
@@ -136,8 +154,8 @@ public final class Zen6View implements View {
         switch (clickedObject) {
             case UICard uiCard -> this.queueAction.accept(PlayerAction.CARD_CHOSE, uiCard.getCard());
             case Button button -> button.onClick(controller);
-            case UIRectangle _, UIHandContainer _, UIBlind _, InfoMenu _, BlindDescriptor _-> {}
             case null -> {}
+            default -> {}
         }
         redraw();
     }

@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.util.List;
 
 import domain.Blind;
-import domain.BlindType;
 
 public final class BlindDescriptor implements UIObject {
 
@@ -26,13 +25,14 @@ public final class BlindDescriptor implements UIObject {
         this.zDepth = zDepth;
 
         int padding = 10;
-        int rowHeight = (height - padding * 4) / 3;
+        int rowHeight = (height - padding) / 2;
+        int colWidth = (width - padding * 3) / 2;
 
-        this.blindName = new UIRectangle(blind.getName(), x + padding, y + padding, width - padding * 2, rowHeight, zDepth + 1);
+        this.blindName = new UIRectangle(blind.getName(), x, y, width - padding * 2, rowHeight, zDepth + 1);
 
-        this.blindType = new UIRectangle("Type : ?To add", x + padding, y + padding * 2 + rowHeight, width - padding * 2, rowHeight, zDepth + 1);
+        this.blindType = new UIRectangle("Type : ?To add", x, y + padding + rowHeight, colWidth, rowHeight, zDepth + 1);
 
-        this.targetScore = new UIRectangle("Target : " + blind.getTargetScore(), x + padding, y + padding * 3 + rowHeight * 2, width - padding * 2, rowHeight, zDepth + 1);
+        this.targetScore = new UIRectangle("Target : " + blind.getTargetScore(), x + padding + colWidth, y + padding + rowHeight, colWidth, rowHeight, zDepth + 1);
     }
 
     @Override
@@ -54,5 +54,11 @@ public final class BlindDescriptor implements UIObject {
 
     public List<UIObject> getObjects() {
         return List.of(blindName, blindType, targetScore);
+    }
+
+    public void refresh(Blind blind){
+        blindName.setText(blind.getName());
+        blindType.setText("Type : ?To add");
+        targetScore.setText("Target : " + blind.getTargetScore());
     }
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 public class HandEvaluator {
 
     public static HandType evaluate(List<Card> cards/*, List<Config> configs*/) {
+        if(cards.isEmpty()){return null;}
         boolean isFlush    = checkFlush(cards);
         boolean isStraight = checkStraight(cards);
         if (isFlush && isStraight) return HandType.STRAIGHT_FLUSH;
