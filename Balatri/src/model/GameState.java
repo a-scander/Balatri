@@ -94,6 +94,7 @@ public class GameState {
 	}
 
     public GameEvent onDiscard() {
+		if(currentBlind.getRemainingDiscardNb() == 0){return null;}
         currentBlind.discard();
         return new HandDiscarded(currentBlind.drawHand());
 	}

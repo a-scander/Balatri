@@ -27,13 +27,13 @@ public final class HandDescriptor implements UIObject {
         
         int padding = 10;
         int rowHeight = (height - padding) / 2;
-        int colWidth = (width - padding * 3) / 2;
+        int colWidth = (width - padding) / 2;
 
-        this.handTypeDisplay = new UIRectangle("<HandType> Lvl: " + HandLevel, x + padding, y, width - padding * 2, rowHeight, zDepth + 1);
+        this.handTypeDisplay = new UIRectangle("<HandType> Lvl: " + HandLevel, x, y, width, rowHeight, zDepth + 1);
 
-        this.chipDisplay = new UIRectangle("Chips : " + handScore.chips(), x + padding, y + rowHeight + padding, colWidth, rowHeight, zDepth + 1);
+        this.chipDisplay = new UIRectangle("Chips : " + handScore.chips(), x, y + rowHeight + padding, colWidth, rowHeight, zDepth + 1);
 
-        this.multDisplay = new UIRectangle("Mult : " + handScore.mult(), x + colWidth + padding * 2, y + rowHeight + padding, colWidth, rowHeight, zDepth + 1);
+        this.multDisplay = new UIRectangle("Mult : " + handScore.mult(), x + colWidth + padding, y + rowHeight + padding, colWidth, rowHeight, zDepth + 1);
 
         //add the handtype name
     }

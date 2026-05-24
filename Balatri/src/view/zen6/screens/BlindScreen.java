@@ -32,9 +32,15 @@ public class BlindScreen extends UIScreen {
             600, 610, 200, 50, 1
         );
 
+        var discardButton = new Button(
+            (ctrl) -> ctrl.queueAction(PlayerAction.DISCARD, null), "discard" ,
+            810, 610, 200, 50, 1
+        );
+
         this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 100, 100, 100, 10);
 
         getUIObjects().add(playButton);
+        getUIObjects().add(discardButton);
     }
 
     public UIHandContainer getUiHandContainer(){return uiHandContainer;}

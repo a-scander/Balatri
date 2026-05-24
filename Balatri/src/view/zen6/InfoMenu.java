@@ -38,7 +38,7 @@ public final class InfoMenu implements UIObject {
 
         int padding = 20;
 
-        int ColumnWidth = (width - padding * 3) / 2;
+        int ColumnWidth = (width - padding * 2 - 10) / 2;
 
         Blind currentBlind = state.getCurrentBlind();
 
@@ -74,17 +74,15 @@ public final class InfoMenu implements UIObject {
 
         this.currentScore = new UIRectangle("" + currentBlind.getScore(), x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
 
-        currentY += currentHeight + padding / 2;
-
-        this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getRemainingHandNb()), x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
+        this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getRemainingHandNb()), x + ColumnWidth + padding +  10, currentY, ColumnWidth, currentHeight, zDepth + 1);
 
         currentY += currentHeight + padding / 2;
 
-        this.remainingDiscards = new UIRectangle("Discards : " + (4 - currentBlind.getRemainingDiscardNb()), x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
+        this.remainingDiscards = new UIRectangle("Discards : " + (4 - currentBlind.getRemainingDiscardNb()), x + ColumnWidth + padding + 10, currentY, ColumnWidth, currentHeight, zDepth + 1);
 
         currentY += currentHeight + padding;
 
-        this.moneyDisplay = new UIRectangle("$ "/* + state.getMoney()*/, x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
+        this.moneyDisplay = new UIRectangle("$ "/* + state.getMoney()*/, x + ColumnWidth + padding + 10, currentY, ColumnWidth, currentHeight, zDepth + 1);
     }
 
     @Override
@@ -145,8 +143,8 @@ public final class InfoMenu implements UIObject {
     public void BlindChanged(Blind blind){
         this.blindDescriptor.refresh(blind);
         
-        this.remainingHands.setText("Hands" + blind.getRemainingHandNb());
-        this.remainingDiscards.setText("Discards" + blind.getRemainingDiscardNb());
+        this.remainingHands.setText("Hands: " + blind.getRemainingHandNb());
+        this.remainingDiscards.setText("Discards: " + blind.getRemainingDiscardNb());
     }
 
     public void onChangedHand(GameState state){

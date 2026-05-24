@@ -58,6 +58,7 @@ public final class Zen6View implements View {
             case GameWon _ -> {screen = EndScreen.fromScreen(null, context, "You Win");}
             case PhaseChange pc -> buildPhaseUI(pc.phase());
             case GameClosed _ -> {IO.println("Game closed.");running = false;context.dispose();System.exit(0);}
+            case null -> {}
         }
         redraw();
     }
@@ -91,7 +92,7 @@ public final class Zen6View implements View {
                         }
 
                     case HandDiscarded hd -> {
-                        BScreen.getUiHandContainer().removeCards(hd.changedCards());
+                        BScreen.getUiHandContainer().refreshHand(controller.getState().getCurrentBlind().getHand().getCards());
                         BScreen.infoMenu.BlindChanged(controller.getState().getCurrentBlind());
                         }
 
@@ -164,7 +165,8 @@ public final class Zen6View implements View {
         switch (phase) {
             case MAIN_SCREEN -> screen = new MainScreen(context);
             case BLIND_SELECTION -> screen = BlindSelectionScreen.fromScreen(screen, controller.getState());
-            case IN_BLIND -> screen = BlindScreen.fromScreen(screen, controller.getState());
+            case IN_BLIND -> {screen = BlindScreen.fromScreen(screen, controller.getState());
+                                ((BlindScreen)screen).infoMenu.refresh(controller.getState());}
             case GAME_OVER -> {}//screen = new EndScreen(context, "you lose");
             default -> {}
         }

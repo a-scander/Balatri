@@ -50,6 +50,7 @@ public final class ConsoleView implements View {
             case GameWon _         -> onGameWon();
             case PhaseChange pc    -> processPhaseChange(pc.phase());
             case GameClosed _      -> {IO.println("Game closed."); running = false;}
+            case null -> {}
         }
     }
 
