@@ -23,9 +23,9 @@ public class GameState {
 	public GameState() {
 		/* Test values */
 		this.blinds = new Blind[] {
-			new Blind("Small Blind", BlindType.SMALL_BLIND, 30),
-			new Blind("Big Blind",   BlindType.BIG_BLIND,   60),
-			new Blind("Boss Blind",  BlindType.BOSS_BLIND,  120)
+			new Blind("Small Blind", BlindType.SMALL_BLIND, 100),
+			new Blind("Big Blind",   BlindType.BIG_BLIND,   150),
+			new Blind("Boss Blind",  BlindType.BOSS_BLIND,  200)
 		};
 
 		for (var planet : Planet.values()) {

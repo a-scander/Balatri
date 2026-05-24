@@ -69,12 +69,15 @@ public final class InfoMenu implements UIObject {
 
         this.currentSelectedHand = new HandDescriptor(x + padding, currentY, width - padding * 2, currentHeight, zDepth + 1, handType, level, handScore);
 
-        currentY += currentHeight + padding;
-        currentHeight = 40;
+        currentY += currentHeight + padding / 2;
+        currentHeight = 30;
 
-        this.currentScore = new UIRectangle("" + currentBlind.getScore(), x + ColumnWidth + padding * 2, currentY, ColumnWidth, currentHeight, zDepth + 1);
+        this.currentScore = new UIRectangle("Score: " + currentBlind.getScore(), (int)(x + ColumnWidth + padding * 1.5), currentY, ColumnWidth, currentHeight, zDepth + 1);
 
-        this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getRemainingHandNb()), x + ColumnWidth + padding +  10, currentY, ColumnWidth, currentHeight, zDepth + 1);
+        currentY += currentHeight + padding / 2;
+        currentHeight = 30;
+
+        this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getRemainingHandNb()), (int)(x + ColumnWidth + padding * 1.5), currentY, ColumnWidth, currentHeight, zDepth + 1);
 
         currentY += currentHeight + padding / 2;
 
@@ -116,6 +119,10 @@ public final class InfoMenu implements UIObject {
         if(currentSelectedHand != null) {
             objects.add(currentSelectedHand);
             objects.addAll(currentSelectedHand.getObjects());
+        }
+
+        if(currentScore != null){
+            objects.add(currentScore);
         }
 
         if(remainingHands != null) {
