@@ -62,6 +62,15 @@ public class CardUtils {
                 .collect(Collectors.groupingBy(card -> card.rank().getValue(), Collectors.counting()));
     }
 
+    // [4H, 4D, 9S, 13c, 2H], count=2 -> [4H, 4D]
+    // [4H, 4D, 4S, 13c, 2H], count=3 -> [4H, 4D, 4S]
+    public static List<Card> getCardsWithCount(List<Card> cards, int count) {
+        Map<Integer, Long> counts = getRankCounts(cards);
+        return cards.stream()
+            .filter(c -> counts.get(c.rank().getValue()) == count)
+            .toList();
+    }
+
     // [4H, 4D, 9S, 13c, 2H], value=4 -> 2
     public static long countOf(List<Card> cards, int value) {
         return getRankCounts(cards).getOrDefault(value, 0L);
@@ -104,5 +113,11 @@ public class CardUtils {
                 ))
                 .values().stream()
                 .toList();
+    }
+    //[9H, 9D] -> 9 + 9 = 18
+    public static int sumChips(List<Card> cards) {
+        return cards.stream()
+                .mapToInt(c -> c.rank().getChips())
+                .sum();
     }
 }

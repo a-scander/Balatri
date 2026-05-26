@@ -52,12 +52,14 @@ public class GameState {
 	}
 
 	public GameEvent onPlayHand() {
-		HandType handType = getSelectedHandType();
-		if(handType == null)return null;
+		HandResult result = getSelectedHandType();
+		if(result == null)return null;
+		HandType handType = result.type();
+
 		Score newScore = getModifiedHandTypeValue(handType);
 		//TODO : routine de scoring des cards et des jokers qui s'executent pendant
 		//TODO : appliquer les jokers qui s"executent apres
-		int score =  newScore.total();
+		int score = (newScore.chips() + CardUtils.sumChips(result.scoringCards())) * newScore.mult();
 		var discardedCards = new ArrayList<>(currentBlind.getSelectedCards());
 		currentBlind.playHand(score);
 
@@ -66,7 +68,7 @@ public class GameState {
 		return new HandPlayed(score, handType, discardedCards, currentBlind.drawHand());
 	}
 
-	public HandType getSelectedHandType(){
+	public HandResult getSelectedHandType(){
 		//TODO: appliquer les jokers qui s'executent avant
 		return HandEvaluator.evaluate(currentBlind.getSelectedCards()); // TODO : return a handresult with the handtype and the scoring cards
 	}

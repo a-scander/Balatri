@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import domain.Blind;
+import domain.HandResult;
 import domain.HandType;
 import domain.Score;
 import model.GameState;
@@ -59,7 +60,9 @@ public final class InfoMenu implements UIObject {
         currentY += currentHeight + padding * 1.5;
         currentHeight = 100;
         
-        HandType handType = state.getSelectedHandType();
+        HandResult result = state.getSelectedHandType();
+        HandType handType = result != null ? result.type() : null;
+        
         String level = "";
         Score handScore = new Score(0, 0);
         if(handType != null){
@@ -156,8 +159,8 @@ public final class InfoMenu implements UIObject {
 
     public void onChangedHand(GameState state){
         Blind currentBlind = state.getCurrentBlind();
-        HandType handType = state.getSelectedHandType();
-
+        HandResult result = state.getSelectedHandType();
+        HandType handType = result != null ? result.type() : null;
         Score handScore = new Score(0, 0);
         String level = "";
         if(handType != null){

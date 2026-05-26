@@ -10,20 +10,21 @@ import java.util.Map;
 
 public class HandEvaluator {
 
-    public static HandType evaluate(List<Card> cards/*, List<Config> configs*/) {
+    public static HandResult evaluate(List<Card> cards/*, List<Config> configs*/) {
         if(cards.isEmpty()){return null;}
         boolean isFlush    = checkFlush(cards);
         boolean isStraight = checkStraight(cards);
-        if (isFlush && isStraight) return HandType.STRAIGHT_FLUSH;
-        if (checkFourOfAKind(cards))  return HandType.FOUR_OF_A_KIND;
-        if (checkFullHouse(cards))    return HandType.FULL_HOUSE;
-        if (isFlush)                  return HandType.FLUSH;
-        if (isStraight)               return HandType.STRAIGHT;
-        if (checkThreeOfAKind(cards)) return HandType.THREE_OF_A_KIND;
-        if (checkTwoPair(cards))      return HandType.TWO_PAIR;
-        if (checkPair(cards))         return HandType.PAIR;
+        if (isFlush && isStraight) return new HandResult(HandType.STRAIGHT_FLUSH, cards);
+        if (checkFourOfAKind(cards))  return new HandResult(HandType.FOUR_OF_A_KIND, getFourOfAKindCards(cards));
+        if (checkFullHouse(cards))    return new HandResult(HandType.FULL_HOUSE, cards);
+        if (isFlush)                  return new HandResult(HandType.FLUSH, cards);
+        if (isStraight)               return new HandResult(HandType.STRAIGHT, cards);
+        if (checkThreeOfAKind(cards)) return new HandResult(HandType.THREE_OF_A_KIND, getThreeOfAKindCards(cards));
+        if (checkTwoPair(cards))      return new HandResult(HandType.TWO_PAIR, getPairCards(cards));
+        if (checkPair(cards))         return new HandResult(HandType.PAIR, getPairCards(cards));
 
-        return HandType.HIGH_CARD;
+        return new HandResult(HandType.HIGH_CARD, List.of(getHighCard(cards)));
+
     }
 //Couleur
     private static boolean checkFlush(List<Card> cards/*, FlushConfig config */) {
@@ -82,5 +83,22 @@ public class HandEvaluator {
 //Paire
     private static boolean checkPair(List<Card> cards) {
         return CardUtils.getRankCounts(cards).containsValue(2L);
+    }
+
+//get cards active
+    private static List<Card> getPairCards(List<Card> cards) {
+        return CardUtils.getCardsWithCount(cards, 2);
+    }
+    
+    private static List<Card> getThreeOfAKindCards(List<Card> cards) {
+        return CardUtils.getCardsWithCount(cards, 3);
+    }
+    
+    private static List<Card> getFourOfAKindCards(List<Card> cards) {
+        return CardUtils.getCardsWithCount(cards, 4);
+    }
+    
+    private static Card getHighCard(List<Card> cards) {
+        return CardUtils.getHighestCard(cards);
     }
 }

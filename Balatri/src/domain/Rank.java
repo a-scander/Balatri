@@ -14,4 +14,12 @@ public enum Rank {
     public int getValue() {
         return value;
     }
+
+    public int getChips() {
+        return switch (this) {
+            case ACE   -> 11;
+            case KING, QUEEN, JACK -> 10;
+            default    -> getValue(); 
+        };
+    }
 }
