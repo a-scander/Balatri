@@ -13,16 +13,16 @@ public class Blind {
     private final BlindType type; // Will be useful once we implement special effects blind ? 
     private final int targetScore;
     private int score;
-	private int handsCurrent;
-	private final int handsPerBlind = 4;
-	private int discardCurrent;
-    private final int discardPerBlind = 4;
+	public int handsCurrent;
+	public int handsPerBlind;
+	public int discardCurrent;
+    public int discardPerBlind;
 	private final Deck deck;
     private final List<Card> discard = new ArrayList<>();
     private final Hand hand;
     private final List<Card> selectedCards = new ArrayList<>();
 
-    public Blind(String name, BlindType type, int targetScore) {
+    public Blind(String name,int HandPerBlind, int DiscardPerBlind, BlindType type,  int targetScore) {
         Objects.requireNonNull(name, "Blind name cannot be null");
         Objects.requireNonNull(type, "Blind type cannot be null");
         if (targetScore <= 0) {
@@ -36,6 +36,9 @@ public class Blind {
         this.discardCurrent = 0; // Should not be a constant
         this.deck = new Deck();
         this.hand = new Hand(8); // Should not be a constant
+        this.discardPerBlind = DiscardPerBlind;
+        this.handsPerBlind = HandPerBlind;
+
     }
 
     public String getName()                 { return name;}
@@ -47,8 +50,6 @@ public class Blind {
     public int getTargetScore()             { return targetScore;}
     public boolean blindIsLost()            { return handsCurrent >= handsPerBlind && score < targetScore;}
     public BlindType getType()              { return type;}
-    public int getHandPerBlind(){return handsPerBlind;}
-    public int getDiscardPerBlind(){return discardPerBlind;}
     public int getRemainingHandNb(){return handsPerBlind - handsCurrent;}
     public int getRemainingDiscardNb(){return discardPerBlind - discardCurrent;}
 
