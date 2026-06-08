@@ -43,15 +43,6 @@ public final class InfoMenu implements UIObject {
 
         Blind currentBlind = state.getCurrentBlind();
 
-        if(currentBlind == null){
-            // this.currentScore = new UIRectangle(, , , , , zDepth + 1, "Choose your\nnext Blind");
-            // this.currentScore = new UIRectangle(, , , , , zDepth + 1, "Score: 0"); //new ScoreDisplay();
-            // this.chipDisplay =  new UIRectangle(, , , , , zDepth + 1, 0);
-            // this.multDisplay =  new UIRectangle(, , , , , zDepth + 1, 0);
-           
-            return;
-        }
-
         int currentHeight = 80;
         int currentY = y + padding;
 
@@ -63,32 +54,32 @@ public final class InfoMenu implements UIObject {
         HandResult result = state.getSelectedHandType();
         HandType handType = result != null ? result.type() : null;
         
-        String level = "";
+        int level = 0;
         Score handScore = new Score(0, 0);
         if(handType != null){
             handScore = state.getModifiedHandTypeValue(handType);
-            level += state.getHandLevel(handType);
+            level = state.getHandLevel(handType);
         }
 
         this.currentSelectedHand = new HandDescriptor(x + padding, currentY, width - padding * 2, currentHeight, zDepth + 1, handType, level, handScore);
-
         currentY += currentHeight + padding / 2;
         currentHeight = 30;
 
         this.currentScore = new UIRectangle("Score: " + currentBlind.getScore(), (int)(x + ColumnWidth + padding * 1.5), currentY, ColumnWidth, currentHeight, zDepth + 1);
-
         currentY += currentHeight + padding / 2;
         currentHeight = 30;
 
         this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getRemainingHandNb()), (int)(x + ColumnWidth + padding * 1.5), currentY, ColumnWidth, currentHeight, zDepth + 1);
-
         currentY += currentHeight + padding / 2;
 
         this.remainingDiscards = new UIRectangle("Discards : " + (4 - currentBlind.getRemainingDiscardNb()), x + ColumnWidth + padding + 10, currentY, ColumnWidth, currentHeight, zDepth + 1);
-
         currentY += currentHeight + padding;
 
         this.moneyDisplay = new UIRectangle("$ "/* + state.getMoney()*/, x + ColumnWidth + padding + 10, currentY, ColumnWidth, currentHeight, zDepth + 1);
+
+        if(!currentBlind.isRunning){
+            reset();
+        }
     }
 
     @Override
@@ -98,11 +89,13 @@ public final class InfoMenu implements UIObject {
 
     @Override
     public void draw(Graphics2D graphics) {
-        graphics.setColor(Color.GRAY);
+        // Draw background (dark purple)
+        graphics.setColor(new Color(26, 31, 58)); // Dark purple background (#1a1f3a)
         graphics.fillRect(x, y, width, height);
         
-        // Draw button border
-        graphics.setColor(Color.BLACK);
+        // Draw border (gold)
+        graphics.setColor(new Color(232, 182, 73)); // Gold (#e8b649)
+        graphics.setStroke(new java.awt.BasicStroke(2));
         graphics.drawRect(x, y, width, height);
     }
 
@@ -148,6 +141,13 @@ public final class InfoMenu implements UIObject {
 
         onChangedHand(state);
         moneyChanged(0);//TODO: change that 
+    }
+
+    public void reset(){
+        this.currentScore.text = "Score: 0";
+        this.remainingHands.text = "Hands:";
+        this.remainingDiscards.text = "Discards:";
+        this.currentSelectedHand.reset();
     }
 
     public void BlindChanged(Blind blind){

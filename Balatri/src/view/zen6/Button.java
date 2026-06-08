@@ -20,12 +20,13 @@ public record Button(Consumer<GameController> action, String name, int x, int y,
     
     @Override
     public void draw(Graphics2D graphics) {
-        // Draw button background
-        graphics.setColor(Color.GRAY);
+        // Balatro style: dark purple background with gold border
+        graphics.setColor(new Color(136, 68, 170)); // Purple (#8844aa)
         graphics.fillRect(x, y, width, height);
         
-        // Draw button border
-        graphics.setColor(Color.BLACK);
+        // Draw button border (gold)
+        graphics.setColor(new Color(232, 182, 73)); // Gold (#e8b649)
+        graphics.setStroke(new java.awt.BasicStroke(2));
         graphics.drawRect(x, y, width, height);
 
         FontMetrics fm = graphics.getFontMetrics();
@@ -36,6 +37,8 @@ public record Button(Consumer<GameController> action, String name, int x, int y,
         int textX = x + (width - textWidth) / 2;
         int textY = y + ((height - textHeight) / 2) + fm.getAscent();
 
+        // White text
+        graphics.setColor(Color.WHITE);
         graphics.drawString(name, textX, textY);
     }
 }

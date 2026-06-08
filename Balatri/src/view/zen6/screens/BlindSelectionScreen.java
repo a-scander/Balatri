@@ -23,16 +23,16 @@ public class BlindSelectionScreen extends UIScreen {
     public List<UIBlind> UIblinds = new java.util.ArrayList<>(); //Should be constant to size 3
 
     public BlindSelectionScreen(GameState state) {
-        this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 100, 100, 100, 10);
+        this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "QUIT", 30, 450, 150, 80, 10);
 
-        this.infoMenu = new InfoMenu(80, 300, 500, 420, 5, state);
+        this.infoMenu = new InfoMenu(30, 30, 580, 700, 5, state);
 
         var blinds = state.getBlinds();
         
         for(int i = 0; i < blinds.size(); i++){
             Blind blind = blinds.get(i);
-            int y = blind == state.getCurrentBlind() ? 300 : 320;
-            var UIblind = new UIBlind(700 + i * 110, y, 100, 220, 1, blinds.get(i), blind == state.getCurrentBlind());
+            int y = blind == state.getCurrentBlind() ? 200 : 220;
+            var UIblind = new UIBlind(750 + i * 240, y, 220, 320, 1, blinds.get(i), blind == state.getCurrentBlind());
             this.UIblinds.add(UIblind);
             getUIObjects().add(UIblind);
             getUIObjects().add(UIblind.selectButton);
@@ -51,18 +51,14 @@ public class BlindSelectionScreen extends UIScreen {
         this(state);
 
         this.quitButton = mainScreen.quitButton;
-        getUIObjects().add(this.quitButton);
     }
 
     public BlindSelectionScreen(BlindScreen blindScreen, GameState state){
         this(state);
 
         this.quitButton = blindScreen.quitButton;
-        getUIObjects().add(this.quitButton);
-
         this.infoMenu = blindScreen.infoMenu;
-        getUIObjects().add(infoMenu);
-        getUIObjects().addAll(infoMenu.getObjects());
+        this.infoMenu.reset();
 
         /*if(blindScreen.jokerContainer != null){
             jokerContainer = blindScreen.jokerContainer;
@@ -76,15 +72,15 @@ public class BlindSelectionScreen extends UIScreen {
             return newScreen;
         }
 
-        return switch(previousScreen){
+        BlindSelectionScreen newScreen = switch(previousScreen){
             case MainScreen m -> new BlindSelectionScreen(m, state);
             case BlindScreen b -> new BlindSelectionScreen(b, state);
-            default -> {
-                BlindSelectionScreen newScreen = new BlindSelectionScreen(state);
-                newScreen.getUIObjects().add(newScreen.quitButton);
-                newScreen.getUIObjects().add(newScreen.infoMenu);
-                newScreen.getUIObjects().addAll(newScreen.infoMenu.getObjects());
-                yield newScreen;}
+            default -> new BlindSelectionScreen(state);
         };
+
+        newScreen.getUIObjects().add(newScreen.quitButton);
+        newScreen.getUIObjects().add(newScreen.infoMenu);
+        newScreen.getUIObjects().addAll(newScreen.infoMenu.getObjects());
+        return newScreen;
     }
 }

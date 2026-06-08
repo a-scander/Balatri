@@ -42,12 +42,17 @@ public final class UIBlind implements UIObject {
     }
 
     @Override
-    public void draw(Graphics2D graphics) {//TODO: make this look better
-        // Draw a semi-transparent overlay to represent the blind
-        graphics.setColor(new Color(0, 0, 0, 128)); // Semi-transparent black
+    public void draw(Graphics2D graphics) {
+        // Draw blind background (dark with purple tint)
+        graphics.setColor(new Color(26, 31, 58)); // Dark purple background
         graphics.fillRect(x, y, width, height);
         
-        // Optionally, draw text or an icon to indicate it's a blind
+        // Draw border (gold)
+        graphics.setColor(new Color(232, 182, 73)); // Gold (#e8b649)
+        graphics.setStroke(new java.awt.BasicStroke(2));
+        graphics.drawRect(x, y, width, height);
+        
+        // Draw text (white)
         graphics.setColor(Color.WHITE);
         String blindText = this.blind.getName();
         FontMetrics fm = graphics.getFontMetrics();

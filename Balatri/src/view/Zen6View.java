@@ -35,10 +35,9 @@ public final class Zen6View implements View {
     @Override
     public void launch(GameController controller, BiConsumer<PlayerAction, Object> queueAction) {
         this.queueAction = queueAction;
-        this.screen = new MainScreen(null);
-        queueAction.accept(PlayerAction.START_GAME, null);
-        Application.run(Color.WHITE, context -> {
+        Application.run(new Color(10, 14, 39), context -> {
             this.context = context;
+            queueAction.accept(PlayerAction.START_GAME, null);
             redraw();
             while (running) {
                 var event = context.pollOrWaitEvent(10);
@@ -54,8 +53,8 @@ public final class Zen6View implements View {
             case HandChangeEvent hce -> processHandChangeEvent(hce);
             
             case BlindBeaten _, BlindOnGoing _ -> {}
-            case GameOver _ -> {screen = EndScreen.fromScreen(null, context, "You Lost");}
-            case GameWon _ -> {screen = EndScreen.fromScreen(null, context, "You Win");}
+            case GameOver _ -> {screen = EndScreen.fromScreen(this.screen, context, "You Lost");}
+            case GameWon _ -> {screen = EndScreen.fromScreen(this.screen, context, "You Win");}
             case PhaseChange pc -> buildPhaseUI(pc.phase());
             case GameClosed _ -> {IO.println("Game closed.");running = false;context.dispose();System.exit(0);}
             case null -> {}
@@ -103,12 +102,14 @@ public final class Zen6View implements View {
     }
 
     private void drawFrame(Graphics2D graphics) {
+        if(this.screen == null)return;
         drawBackground(graphics);
         screen.render(graphics);
     }
 
     private void redraw() {
         if(this.context == null)return;
+        if(this.screen == null)return;
         context.renderFrame(this::drawFrame);
     }
 
@@ -163,7 +164,7 @@ public final class Zen6View implements View {
 
     private void buildPhaseUI(Phase phase) {
         switch (phase) {
-            case MAIN_SCREEN -> screen = new MainScreen(context);
+            case MAIN_SCREEN -> screen = new MainScreen(this.context);
             case BLIND_SELECTION -> screen = BlindSelectionScreen.fromScreen(screen, controller.getState());
             case IN_BLIND -> {screen = BlindScreen.fromScreen(screen, controller.getState());
                                 ((BlindScreen)screen).infoMenu.refresh(controller.getState());}

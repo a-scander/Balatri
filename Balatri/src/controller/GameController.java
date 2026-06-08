@@ -107,7 +107,7 @@ public class GameController {
 
         GameEvent outcome = state.checkOutcome();
         switch(outcome){
-            case BlindBeaten _ -> {if(state.getPhase() != Phase.BLIND_SELECTION)changePhase(Phase.BLIND_SELECTION);}
+            case BlindBeaten _ -> {if(state.getPhase() != Phase.BLIND_SELECTION)state.endBlind(); changePhase(Phase.BLIND_SELECTION);}
 
             case BlindOnGoing _ -> {if(state.getPhase() != Phase.IN_BLIND)changePhase(Phase.IN_BLIND);}
 
@@ -133,6 +133,7 @@ public class GameController {
     private void startBlind() {
         /*once the user has selected the blind starts it */
         /*Should initialize the blind properly*/
+        state.startBlind();
         changePhase(Phase.IN_BLIND);
         emit(state.drawHand());
     }

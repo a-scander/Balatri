@@ -17,7 +17,6 @@ public class UIScreen{
 
     public UIScreen(){}
 
-
     //Maybe do static classes to be able to turn UIScreen into an interface
     public void render(Graphics2D graphics){
         for(var obj : uiObjects){

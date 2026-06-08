@@ -18,7 +18,7 @@ public final class HandDescriptor implements UIObject {
     public UIRectangle chipDisplay;
     public UIRectangle multDisplay;
 
-    public HandDescriptor(int x, int y, int width, int height, int zDepth, HandType handType, String HandLevel, Score handScore) {
+    public HandDescriptor(int x, int y, int width, int height, int zDepth, HandType handType, int HandLevel, Score handScore) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -29,7 +29,7 @@ public final class HandDescriptor implements UIObject {
         int rowHeight = (height - padding) / 2;
         int colWidth = (width - padding) / 2;
 
-        this.handTypeDisplay = new UIRectangle("<HandType> Lvl: " + HandLevel, x, y, width, rowHeight, zDepth + 1);
+        this.handTypeDisplay = new UIRectangle("<HandType> Lvl: " + ((HandLevel == 0) ? "" : HandLevel), x, y, width, rowHeight, zDepth + 1);
 
         this.chipDisplay = new UIRectangle("Chips : " + handScore.chips(), x, y + rowHeight + padding, colWidth, rowHeight, zDepth + 1);
 
@@ -63,5 +63,11 @@ public final class HandDescriptor implements UIObject {
         handTypeDisplay.setText("<HandType> Lvl: " + handLevel);
         chipDisplay.setText("Chips: " + handScore.chips());
         multDisplay.setText("Mult: " + handScore.mult());
+    }
+
+    public void reset(){
+        handTypeDisplay.setText("");
+        chipDisplay.setText("Chips: ");
+        multDisplay.setText("Mult: ");
     }
 }

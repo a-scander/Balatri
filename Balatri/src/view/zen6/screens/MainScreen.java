@@ -1,5 +1,7 @@
 package view.zen6.screens;
 
+import java.util.Objects;
+
 import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.ScreenInfo;
 
@@ -10,17 +12,15 @@ public final class MainScreen extends UIScreen {
     public Button quitButton = null;
 
     public MainScreen(ApplicationContext context){
-        getUIObjects().clear();
-        int X = 10, Y = 10;
-        int width = 250, height = 80;
-        if(context != null){
-            ScreenInfo si = context.getScreenInfo();
-            X = si.width()/2 - width/2;
-            Y = si.height()/2 - height/2;
-        }
+        Objects.requireNonNull(context);
 
-        var startButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.BLIND_SELECTION, null), "startGame", X, Y, width, height, 1);
-        var quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 0, 100, 100, 10);
+        int width = 300, height = 100;
+        ScreenInfo si = context.getScreenInfo();
+        int X = si.width()/2 - width/2;
+        int Y = si.height()/2 - height/2;
+
+        var startButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.BLIND_SELECTION, null), "START GAME", X, Y, width, height, 1);
+        var quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "QUIT", 30, si.height() - 100, 150, 80, 10);
 
         this.quitButton = quitButton;
 

@@ -17,12 +17,18 @@ public record UICard(Card card, int x, int y, int width, int height, int zDepth,
     @Override
     public void draw(Graphics2D graphics) {
 
-        // Draw card background
-        graphics.setColor(Color.WHITE);
+        // Draw card background (light)
+        graphics.setColor(new Color(245, 245, 245)); // Light card background
         graphics.fillRect(x, y, width, height);
 
-        // Draw card border (highlight if selected)
-        graphics.setColor(isSelected ? Color.RED : Color.BLACK);
+        // Draw card border (gold if selected, black otherwise)
+        if (isSelected) {
+            graphics.setColor(new Color(232, 182, 73)); // Gold (#e8b649)
+            graphics.setStroke(new java.awt.BasicStroke(3));
+        } else {
+            graphics.setColor(Color.BLACK);
+            graphics.setStroke(new java.awt.BasicStroke(1));
+        }
         graphics.drawRect(x, y, width, height);
 
         // Draw card details (rank and suit)

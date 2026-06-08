@@ -10,6 +10,7 @@ import event.OutputEvent.GameEvent;
 /*Not a simple class but still in domain package, maybe to move to another one */
 public class Blind {
     private final String name;
+    public boolean isRunning;
     private final BlindType type; // Will be useful once we implement special effects blind ? 
     private final int targetScore;
     private int score;
@@ -29,6 +30,7 @@ public class Blind {
             throw new IllegalArgumentException("Target score must be positive");
         }
         this.name = name;
+        this.isRunning = false;
         this.type = type;
         this.targetScore = targetScore;
         this.score = 0;

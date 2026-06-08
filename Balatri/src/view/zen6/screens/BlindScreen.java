@@ -20,27 +20,12 @@ public class BlindScreen extends UIScreen {
 
     public BlindScreen(GameState state){
         this.uiHandContainer = new UIHandContainer(
-            600, 400, 1000, 200, 0
+            700, 450, 1180, 250, 0
         );
+
+        this.infoMenu = new InfoMenu(30, 30, 580, 700, 5, state);
     
-        getUIObjects().add(this.uiHandContainer);
-
-        this.infoMenu = new InfoMenu(40, 40, 500, 420, 5, state);
-    
-        var playButton = new Button(
-            (ctrl) -> ctrl.queueAction(PlayerAction.PLAY_HAND, null), "playhand" ,
-            600, 610, 200, 50, 1
-        );
-
-        var discardButton = new Button(
-            (ctrl) -> ctrl.queueAction(PlayerAction.DISCARD, null), "discard" ,
-            810, 610, 200, 50, 1
-        );
-
-        this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 100, 100, 100, 10);
-
-        getUIObjects().add(playButton);
-        getUIObjects().add(discardButton);
+        this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "QUIT", 30, 450, 150, 80, 10);
     }
 
     public UIHandContainer getUiHandContainer(){return uiHandContainer;}
@@ -64,18 +49,20 @@ public class BlindScreen extends UIScreen {
     public static BlindScreen fromScreen(UIScreen previousScreen, GameState state){
         if(previousScreen == null){
             BlindScreen newScreen = new BlindScreen(state);
-            newScreen.getUIObjects().add(newScreen.quitButton);
             return newScreen;
         }
 
-        return switch(previousScreen){
+        BlindScreen newScreen = switch(previousScreen){
             case BlindSelectionScreen b -> new BlindScreen(b, state);
-            default -> {
-                BlindScreen newScreen = new BlindScreen(state);
-                newScreen.getUIObjects().add(newScreen.quitButton);
-                newScreen.getUIObjects().add(newScreen.infoMenu);
-                newScreen.getUIObjects().addAll(newScreen.infoMenu.getObjects());
-                yield newScreen;}
+            default -> new BlindScreen(state);
         };
+
+        newScreen.getUIObjects().add(newScreen.quitButton);
+        newScreen.getUIObjects().add(newScreen.infoMenu);
+        newScreen.getUIObjects().addAll(newScreen.infoMenu.getObjects());
+        newScreen.getUIObjects().add(newScreen.uiHandContainer);
+        newScreen.getUIObjects().addAll(newScreen.uiHandContainer.getObjects());
+
+        return newScreen;
     }
 }

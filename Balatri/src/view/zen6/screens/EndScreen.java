@@ -10,13 +10,13 @@ public class EndScreen extends UIScreen{
     private Button quitButton;
 
     public EndScreen(ApplicationContext context, String message) {
-        int width = 250, height = 80;
+        int width = 300, height = 100;
         ScreenInfo si = context.getScreenInfo();
         int X = si.width()/2 - width/2;
         int Y = si.height()/2 - height/2;
 
         var playButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.START_GAME, null), message ,X, Y, width ,height, 1); //conteext isn't initialize on first screen
-        this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "quit", 0, 0, 100, 100, 10);
+        this.quitButton = new Button((ctrl) -> ctrl.queueAction(PlayerAction.QUIT_GAME, null), "QUIT", 30, si.height() - 100, 150, 80, 10);
 
         getUIObjects().add(playButton);
     }
@@ -25,29 +25,20 @@ public class EndScreen extends UIScreen{
         this(context, message);
 
         this.quitButton = blindScreen.quitButton;
-        getUIObjects().add(this.quitButton);
     }
-
-    public EndScreen(BlindSelectionScreen blindSelectionScreen, ApplicationContext context, String message){
-        this(context, message);
-
-        this.quitButton = blindSelectionScreen.quitButton;
-        getUIObjects().add(this.quitButton);
-    }
-
     public static EndScreen fromScreen(UIScreen previousScreen, ApplicationContext context, String message){
         if(previousScreen == null){
             EndScreen newScreen = new EndScreen(context, message);
             newScreen.getUIObjects().add(newScreen.quitButton);
             return newScreen;
         }
-        return switch(previousScreen){
+        EndScreen newScreen = switch(previousScreen){
             case BlindScreen b -> new EndScreen(b, context, message);
-            case BlindSelectionScreen bs -> new EndScreen(bs, context, message);
-            default -> {
-                EndScreen newScreen = new EndScreen(context, message);
-                newScreen.getUIObjects().add(newScreen.quitButton);
-                yield newScreen;}
+            default -> new EndScreen(context, message);
         };
+
+        newScreen.getUIObjects().add(newScreen.quitButton);
+        return newScreen;
+
     }
 }

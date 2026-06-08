@@ -38,12 +38,13 @@ public final class UIRectangle implements UIObject {
     
     @Override
     public void draw(Graphics2D graphics) {
-        // Draw button background
-        graphics.setColor(Color.GRAY);
+        // Draw background (dark purple)
+        graphics.setColor(new Color(26, 31, 58)); // Dark purple background (#1a1f3a)
         graphics.fillRect(x, y, width, height);
         
-        // Draw button border
-        graphics.setColor(Color.BLACK);
+        // Draw border (gold)
+        graphics.setColor(new Color(232, 182, 73)); // Gold (#e8b649)
+        graphics.setStroke(new java.awt.BasicStroke(2));
         graphics.drawRect(x, y, width, height);
 
         if(this.text == null){return;}
@@ -51,6 +52,9 @@ public final class UIRectangle implements UIObject {
         FontMetrics fm = graphics.getFontMetrics();
         int textWidth = fm.stringWidth(blindText);
         int textHeight = fm.getHeight();
+        
+        // White text
+        graphics.setColor(Color.WHITE);
         graphics.drawString(blindText, x + (width - textWidth) / 2, y + (height + textHeight / 2) / 2);
     }
 }

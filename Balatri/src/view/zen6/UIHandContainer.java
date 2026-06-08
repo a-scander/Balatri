@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import domain.Card;
+import event.InputEvent.PlayerAction;
 
 public final class UIHandContainer implements UIObject {
     private int x;
@@ -16,12 +17,42 @@ public final class UIHandContainer implements UIObject {
     private int zDepth; 
     private List<UICard> cards = new ArrayList<>();
 
+    private Button discardButton;
+    private Button playButton;
+    private Button sortByRankButton;
+    private Button sortBySuitButton;
+
     public UIHandContainer(int x, int y, int width, int height, int zDepth) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.zDepth = zDepth;
+
+        int currentX = x;
+        this.playButton = new Button(
+            (ctrl) -> ctrl.queueAction(PlayerAction.PLAY_HAND, null), "PLAY HAND" ,
+            currentX, y +  height + 20, 380, 70, 1
+        );
+        currentX += 380 + 20;
+
+        this.sortByRankButton = new Button(
+            (ctrl) -> {this.sortCards(); this.recomputeCardsCoordinates(); IO.println("Sorted by rank");}, "SORT BY RANK" ,
+            currentX, y +  height + 20 + 5, 180, 60, 1
+        );
+        currentX += 180 + 20;
+        
+        this.sortBySuitButton = new Button(
+            (ctrl) -> {this.sortCardsBySuit(); this.recomputeCardsCoordinates();IO.println("Sorted by suit");}, "SORT BY SUIT" ,
+            currentX, y +  height + 20 + 5, 180, 60, 1
+        );
+        currentX += 180 + 20;
+
+
+        this.discardButton = new Button(
+            (ctrl) -> ctrl.queueAction(PlayerAction.DISCARD, null), "DISCARD" ,
+            currentX, y + height + 20, 380, 70, 1
+        );
     }
 
     @Override
@@ -34,12 +65,23 @@ public final class UIHandContainer implements UIObject {
 
     @Override
     public void draw(Graphics2D graphics) {
-        // Draw container background
-        graphics.setColor(Color.GRAY);
+        // Draw container background (dark)
+        graphics.setColor(new Color(10, 14, 39)); // Very dark blue-black (#0a0e27)
         graphics.fillRect(x, y, width, height);
+        
+        // Draw border (gold)
+        graphics.setColor(new Color(232, 182, 73)); // Gold (#e8b649)
+        graphics.setStroke(new java.awt.BasicStroke(2));
+        graphics.drawRect(x, y, width, height);
+        
         for(var card: cards){
             card.draw(graphics);
         }
+
+        this.sortByRankButton.draw(graphics);
+        this.sortBySuitButton.draw(graphics);
+        this.discardButton.draw(graphics);
+        this.playButton.draw(graphics);
     }
 
     private void sortCards() {
@@ -48,13 +90,19 @@ public final class UIHandContainer implements UIObject {
             .thenComparing(c -> c.getCard().suit().ordinal()));
     }
 
+    private void sortCardsBySuit(){
+        cards.sort(Comparator
+            .comparing((UICard c) -> c.getCard().suit().ordinal())
+            .thenComparingInt((UICard c) -> c.getCard().rank().getValue()));
+        }
+
     public void addCards(List<Card> changedCards) {
         changedCards.forEach(c -> addCard(c));
         recomputeCardsCoordinates();
     }
 
     public void addCard(Card card){
-        cards.add(new UICard(card, 0, 0, 100, 150, zDepth + 1, false));
+        cards.add(new UICard(card, 0, 0, 120, 180, zDepth + 1, false));
     }
 
     public void removeCards(List<Card> removedCards){
@@ -72,12 +120,11 @@ public final class UIHandContainer implements UIObject {
     }
 
     public void recomputeCardsCoordinates(){
-        sortCards();
         for(int i = 0; i < cards.size(); i++){
             UICard card = cards.get(i);
-            int x = this.x + 10 + i * 110;
-            int y = this.y + 30;
-            cards.set(i, new UICard(card.getCard(), x, y, 100, 150, zDepth + 1, card.isSelected()));
+            int x = this.x + 20 + i * 135;
+            int y = this.y + 35;
+            cards.set(i, new UICard(card.getCard(), x, y, 120, 180, zDepth + 1, card.isSelected()));
         }
     }
 
@@ -120,5 +167,9 @@ public final class UIHandContainer implements UIObject {
             }
         }
         return null;
+    }
+
+    public List<UIObject> getObjects(){
+        return List.of(this.discardButton, this.playButton, this.sortByRankButton, this.sortBySuitButton);
     }
 }

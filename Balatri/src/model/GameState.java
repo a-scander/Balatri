@@ -138,11 +138,12 @@ public class GameState {
 	public Score scoreCards(HandResult result){
 		for(var card : result.scoringCards()){
 			for(var joker : this.jokers.get(JokerType.DURING)){
-				if(joker.activates()){ //TODO
+				/*if(joker.activates()){ //TODO
 					joker.apply(this);
-				}
+				}*/
 			}
 		}
+		return new Score(0, 0); //TODO: return the score of the cards with the jokers applied
 		/*
 		for(var card : currrentBlind.getHand()){
 			for(var joker : this.jokers.get(JokerType.DURING)){
@@ -152,5 +153,12 @@ public class GameState {
 			}
 		}
 		*/
+	}
+
+	public void startBlind(){
+		this.currentBlind.isRunning = true;
+	}
+	public void endBlind(){
+		this.currentBlind.isRunning = false;
 	}
 }
