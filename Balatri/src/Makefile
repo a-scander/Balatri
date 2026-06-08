@@ -8,6 +8,8 @@ run: build
 build:
 	mkdir -p $(BIN)
 	javac -d $(BIN) -cp "$(JAR):$(SRC)" $(shell find . -name '*.java')
+	mkdir -p $(BIN)/data
+	cp -r ../data/* $(BIN)/data/
 
 clean:
 	rm -rf $(BIN)

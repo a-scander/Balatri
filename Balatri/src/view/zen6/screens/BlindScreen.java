@@ -8,7 +8,7 @@ import view.zen6.UIHandContainer;
 
 public class BlindScreen extends UIScreen {
     public Button quitButton;
-    public UIHandContainer uiHandContainer;// TODO: add the sort buttons and play and discard button to the UIHandContainer class 
+    public UIHandContainer uiHandContainer;
 
     public InfoMenu infoMenu; //Remember to refresh on state change and on HandChangEvent
     

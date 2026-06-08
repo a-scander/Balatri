@@ -86,18 +86,19 @@ public final class UIHandContainer implements UIObject {
 
     private void sortCards() {
         cards.sort(Comparator
-            .comparingInt((UICard c) -> c.getCard().rank().getValue())
-            .thenComparing(c -> c.getCard().suit().ordinal()));
+            .comparingInt((UICard c) -> c.card().rank().getValue())
+            .thenComparing(c -> c.card().suit().ordinal()));
     }
 
     private void sortCardsBySuit(){
         cards.sort(Comparator
-            .comparing((UICard c) -> c.getCard().suit().ordinal())
-            .thenComparingInt((UICard c) -> c.getCard().rank().getValue()));
+            .comparing((UICard c) -> c.card().suit().ordinal())
+            .thenComparingInt((UICard c) -> c.card().rank().getValue()));
         }
 
     public void addCards(List<Card> changedCards) {
         changedCards.forEach(c -> addCard(c));
+        sortCards();
         recomputeCardsCoordinates();
     }
 
@@ -112,7 +113,7 @@ public final class UIHandContainer implements UIObject {
 
     public void removeCard(Card card){
         for(var c: cards){
-            if(c.getCard().equals(card)){
+            if(c.card().equals(card)){
                 cards.remove(c);
                 break;
             }
@@ -124,7 +125,7 @@ public final class UIHandContainer implements UIObject {
             UICard card = cards.get(i);
             int x = this.x + 20 + i * 135;
             int y = this.y + 35;
-            cards.set(i, new UICard(card.getCard(), x, y, 120, 180, zDepth + 1, card.isSelected()));
+            cards.set(i, new UICard(card.card(), x, y, 120, 180, zDepth + 1, card.isSelected()));
         }
     }
 
@@ -133,10 +134,10 @@ public final class UIHandContainer implements UIObject {
             boolean found = false;
             for(int i = 0; i < cards.size(); i++){
                 UICard uiCard = cards.get(i);
-                if(uiCard.getCard().equals(card)){
+                if(uiCard.card().equals(card)){
                     found = true;
                     int newY = uiCard.y() + (isSelected ? -20 : 20);
-                    cards.set(i, new UICard(uiCard.getCard(), uiCard.x(), newY, uiCard.width(), uiCard.height(), uiCard.zDepth(), isSelected));
+                    cards.set(i, new UICard(uiCard.card(), uiCard.x(), newY, uiCard.width(), uiCard.height(), uiCard.zDepth(), isSelected));
                 }
             }
             if(!found){
@@ -148,6 +149,7 @@ public final class UIHandContainer implements UIObject {
     public void refreshHand(List<Card> cards) {
         removeAllCards();
         cards.forEach(c -> addCard(c));
+        sortCards();
         recomputeCardsCoordinates();
     }
 
@@ -155,7 +157,7 @@ public final class UIHandContainer implements UIObject {
         cards.clear();
     }
 
-    public java.util.List<UICard> getCards() {
+    public List<UICard> getCards() {
         return new ArrayList<>(cards);
     }
 

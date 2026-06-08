@@ -154,7 +154,7 @@ public final class Zen6View implements View {
         UIObject clickedObject = screen.getClickedObject(new Point(location.x(), location.y()));
         
         switch (clickedObject) {
-            case UICard uiCard -> this.queueAction.accept(PlayerAction.CARD_CHOSE, uiCard.getCard());
+            case UICard uiCard -> this.queueAction.accept(PlayerAction.CARD_CHOSE, uiCard.card());
             case Button button -> button.onClick(controller);
             case null -> {}
             default -> {}
