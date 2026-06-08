@@ -38,21 +38,19 @@ public final class InfoMenu implements UIObject {
         this.zDepth = zDepth;
 
         int padding = 20;
-
-        int ColumnWidth = (width - padding * 2 - 10) / 2;
+        int innerPadding = 10;
+        int ColumnWidth = (width - padding * 2 - innerPadding) / 2;
 
         Blind currentBlind = state.getCurrentBlind();
-
-        int currentHeight = 80;
         int currentY = y + padding;
-
+        int currentHeight = 80;
         this.blindDescriptor = new BlindDescriptor(currentBlind, x + padding, currentY, width - padding, currentHeight, zDepth + 1);
 
-        currentY += currentHeight + padding * 1.5;
+        currentY += currentHeight + padding + innerPadding;
         currentHeight = 100;
         
-        HandResult result = state.getSelectedHandType();
-        HandType handType = result != null ? result.type() : null;
+        HandResult result = (currentBlind == null) ? null: state.getSelectedHandType();
+        HandType handType = result == null ? null : result.type();
         
         int level = 0;
         Score handScore = new Score(0, 0);
@@ -65,21 +63,17 @@ public final class InfoMenu implements UIObject {
         currentY += currentHeight + padding / 2;
         currentHeight = 30;
 
-        this.currentScore = new UIRectangle("Score: " + currentBlind.getScore(), (int)(x + ColumnWidth + padding * 1.5), currentY, ColumnWidth, currentHeight, zDepth + 1);
-        currentY += currentHeight + padding / 2;
+        this.currentScore = new UIRectangle("Score: " + ((currentBlind == null) ? "":currentBlind.getScore()), (int)(x + ColumnWidth + padding + innerPadding), currentY, ColumnWidth, currentHeight, zDepth + 1);
+        currentY += currentHeight + innerPadding;
         currentHeight = 30;
 
-        this.remainingHands = new UIRectangle("Hands : " + (4 - currentBlind.getRemainingHandNb()), (int)(x + ColumnWidth + padding * 1.5), currentY, ColumnWidth, currentHeight, zDepth + 1);
-        currentY += currentHeight + padding / 2;
+        this.remainingHands = new UIRectangle("Hands : " + ((currentBlind == null) ? "":(4 - currentBlind.getRemainingHandNb())), (int)(x + ColumnWidth + padding + innerPadding), currentY, ColumnWidth, currentHeight, zDepth + 1);
+        currentY += currentHeight + innerPadding;
 
-        this.remainingDiscards = new UIRectangle("Discards : " + (4 - currentBlind.getRemainingDiscardNb()), x + ColumnWidth + padding + 10, currentY, ColumnWidth, currentHeight, zDepth + 1);
+        this.remainingDiscards = new UIRectangle("Discards : " + ((currentBlind == null) ? "":(4 - currentBlind.getRemainingDiscardNb())), x + ColumnWidth + padding + innerPadding, currentY, ColumnWidth, currentHeight, zDepth + 1);
         currentY += currentHeight + padding;
 
         this.moneyDisplay = new UIRectangle("$ "/* + state.getMoney()*/, x + ColumnWidth + padding + 10, currentY, ColumnWidth, currentHeight, zDepth + 1);
-
-        if(!currentBlind.isRunning){
-            reset();
-        }
     }
 
     @Override

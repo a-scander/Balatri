@@ -20,18 +20,21 @@ public class Deck {
 	}
 	
 	public List<Card> drawCards(int n) {
-        if (deckCards.size() < n) {
-        	deckCards.addAll(discardCards);
-        	discardCards.clear();
-            Collections.shuffle(deckCards);
-        }
-
         List<Card> drawn = new ArrayList<>();
         for (int i = 0; i < n; i++) {
+			checkDeckSize();
             drawn.add(deckCards.remove(deckCards.size() - 1)); //Maybe a check for each drawn card if the deck still has enough remaining cards
         }
         return drawn;
     }
+
+	private void checkDeckSize(){
+		if (deckCards.size() - 1 <= 0) {
+        	deckCards.addAll(discardCards);
+        	discardCards.clear();
+            Collections.shuffle(deckCards);
+        }
+	}
 	
 	public void discardCards(List<Card> cards) {discardCards.addAll(cards);}
 

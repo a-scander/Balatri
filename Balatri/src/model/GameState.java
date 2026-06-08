@@ -14,11 +14,11 @@ import event.OutputEvent.*;
 
 public class GameState {
 	private final Blind[] blinds;
-	private int blindIndex;
+	public int blindIndex;
 	private Blind currentBlind;
 
-	public int handsPerBlind = 3;
-	public int discardsPerBlind = 3;
+	public int handsPerBlind = 4;
+	public int discardsPerBlind = 4;
 	
 	private final Map<Planet, Integer> planetsObtained = new EnumMap<>(Planet.class);
 	public FlushConfig flushConfig;
@@ -44,7 +44,7 @@ public class GameState {
         }
 
 		this.blindIndex = 0;//Math.MIN
-		this.currentBlind = blinds[blindIndex]; //this is not to do at initialization but at blind_selection event call should be null
+		this.currentBlind = null; //this is not to do at initialization but at blind_selection event call should be null
 		this.phase = Phase.INITIALIZE;
 	}
 
@@ -54,15 +54,13 @@ public class GameState {
 
 	public Blind getCurrentBlind()			{ return currentBlind; }
 	public Map<Planet, Integer> getPlanetsObtained() { return planetsObtained; }
-	public int getBlindIndex()				{ return blindIndex; }
 	public Phase getPhase()					{ return phase; }
 	public void setPhase(Phase phase)		{ this.phase = phase; }
 	public GameEvent drawHand()				{ return new HandDrawn(currentBlind.drawHand()); }
 	public List<Blind> getBlinds()			{ return List.of(blinds); }
+	public void addPlanet(Planet p)					{ planetsObtained.merge(p, 1, Integer::sum);}
 
 	public GameEvent selectCard(Card card) {
-		//TODO: if size is good select else message
-		//if (currentblind.maxselectSize < currentblind.getSelectedCards().size() || modifiers has changed mas selection size)
 		return currentBlind.selectCard(card);
 	}
 
@@ -98,13 +96,7 @@ public class GameState {
 		}
 
 		if (blindIndex < blinds.length - 1) {
-				blindIndex++;
-				currentBlind = blinds[blindIndex];
-				Planet p = Planet.getRandom();
-				planetsObtained.merge(p, 1, Integer::sum);
-				//DEBUG: TODO: an event PLANET_OBTAINED
-				IO.println(p);
-				return new BlindBeaten();
+			return new BlindBeaten();
 		}
 		
 		return new GameWon();
@@ -156,9 +148,12 @@ public class GameState {
 	}
 
 	public void startBlind(){
-		this.currentBlind.isRunning = true;
+		this.currentBlind = blinds[blindIndex];
 	}
+
 	public void endBlind(){
-		this.currentBlind.isRunning = false;
+		IO.println("ENNDED");
+		this.blindIndex++;
+		this.currentBlind = null;
 	}
 }

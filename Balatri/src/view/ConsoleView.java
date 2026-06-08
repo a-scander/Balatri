@@ -11,6 +11,10 @@ import java.util.function.BiConsumer;
 
 import controller.GameController;
 
+
+/* The inputs are heavily phase-dependent and for now they are never checked against the current phase
+* Which won't happen because frankly it's only a proof of concept that hasn't been maintained from the beta  ¤-¤ */
+
 public final class ConsoleView implements View {
 
     private final GameController controller;
@@ -40,10 +44,10 @@ public final class ConsoleView implements View {
     public void onEvent(GameEvent event) {
         switch(event) {
             case HandDrawn _       -> onHandDrawn();
-            case CardSelected cs    -> {if(cs.changedCards() == null){IO.println("Maximum selection size reached");}onCardSelected();}
+            case CardSelected cs   -> {if(cs.changedCards() == null){IO.println("Maximum selection size reached");}onCardSelected();}
             case CardUnselected _  -> onCardSelected();
             case HandDiscarded _   -> onHandDrawn();
-            case HandPlayed hp      -> onHandPlayed(hp);
+            case HandPlayed hp     -> onHandPlayed(hp);
             case BlindBeaten _     -> onBlindBeaten();
             case BlindOnGoing _    -> displayGameInfo();
             case GameOver _        -> onGameOver();

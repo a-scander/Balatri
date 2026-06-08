@@ -25,14 +25,11 @@ public class GameController {
 
     public void launch() {
 
-        //Should replace launch(this, queueAction)
-        //By launch(this, () -> queueAction; processQueuedAction; )
         if (views.isEmpty()) {
             throw new IllegalStateException("A view must be assigned before launching the game.");
         }
         if(views.size() == 1){
-            views.getFirst().launch(this, (action, data) -> {
-                        queueAction(action, data); processQueuedActions();});
+            views.getFirst().launch(this, (action, data) -> {queueAction(action, data); processQueuedActions();});
             return;
         }
 
@@ -52,9 +49,7 @@ public class GameController {
         for (View view : views) {
             switch(view){
                 case Zen6View zen6View -> {
-                    zen6View.launch(this, (action, data) -> {
-                        queueAction(action, data); processQueuedActions();}
-                    );
+                    zen6View.launch(this, (action, data) -> {queueAction(action, data); processQueuedActions();});
                     return;} //Stops at the first GUI view, we don't want to launch multiple GUI views
                 default -> {}
             }
@@ -83,16 +78,10 @@ public class GameController {
             case CARD_CHOSE -> { emit(state.selectCard((Card) data));}
             case PLAY_HAND -> { playHand();}
             case DISCARD -> emit(state.onDiscard());
-            /*TODO : saving the current state and game in the controller*/
             case QUIT_GAME -> emit(new GameClosed());
             case START_GAME -> startGame();
             case SELECT_BLIND -> startBlind();
             case BLIND_SELECTION -> initializeGame();
-            /*TODO: add phase changes
-            * case START_GAME -> initializeGame();
-            * case BLIND_SELECTED -> startBlind();
-            * case SELECT_BLIND -> startBlind();
-            */
         }
     }
 
@@ -107,7 +96,14 @@ public class GameController {
 
         GameEvent outcome = state.checkOutcome();
         switch(outcome){
-            case BlindBeaten _ -> {if(state.getPhase() != Phase.BLIND_SELECTION)state.endBlind(); changePhase(Phase.BLIND_SELECTION);}
+            case BlindBeaten _ -> {
+                if(state.getPhase() != Phase.BLIND_SELECTION){
+                    state.endBlind(); 
+                    Planet p = Planet.getRandom();
+			        state.addPlanet(p);;
+			        //TODO: an event PLANET_OBTAINED instead of IO.println everytime
+			        IO.println(p);
+                    changePhase(Phase.BLIND_SELECTION);}}
 
             case BlindOnGoing _ -> {if(state.getPhase() != Phase.IN_BLIND)changePhase(Phase.IN_BLIND);}
 
@@ -133,12 +129,15 @@ public class GameController {
     private void startBlind() {
         /*once the user has selected the blind starts it */
         /*Should initialize the blind properly*/
+
         state.startBlind();
         changePhase(Phase.IN_BLIND);
         emit(state.drawHand());
     }
 
-    private void finishGame() {
+    private void skipBlind() {
+        state.blindIndex++;
+        changePhase(Phase.BLIND_SELECTION);
     }
     
     private void changePhase(Phase phase) {

@@ -9,22 +9,21 @@ import java.util.Map;
  Raccourci: Les suites peuvent être formées avec des espacement de *1* entre les cartes */
 
 public class HandEvaluator {
-
+    //TODO return a List of HandResult and keep only the highest scoring one before card scoring
     public static HandResult evaluate(List<Card> cards/*, List<Config> configs*/) {
         if(cards.isEmpty()){return null;}
         boolean isFlush    = checkFlush(cards);
         boolean isStraight = checkStraight(cards);
         if (isFlush && isStraight) return new HandResult(HandType.STRAIGHT_FLUSH, cards);
         if (checkFourOfAKind(cards))  return new HandResult(HandType.FOUR_OF_A_KIND, getFourOfAKindCards(cards));
+        if (isStraight && getLowCard(cards).rank() == Rank.TEN) return new HandResult(HandType.ROYAL_FLUSH, cards);
         if (checkFullHouse(cards))    return new HandResult(HandType.FULL_HOUSE, cards);
         if (isFlush)                  return new HandResult(HandType.FLUSH, cards);
         if (isStraight)               return new HandResult(HandType.STRAIGHT, cards);
         if (checkThreeOfAKind(cards)) return new HandResult(HandType.THREE_OF_A_KIND, getThreeOfAKindCards(cards));
         if (checkTwoPair(cards))      return new HandResult(HandType.TWO_PAIR, getPairCards(cards));
         if (checkPair(cards))         return new HandResult(HandType.PAIR, getPairCards(cards));
-
         return new HandResult(HandType.HIGH_CARD, List.of(getHighCard(cards)));
-
     }
 //Couleur
     private static boolean checkFlush(List<Card> cards/*, FlushConfig config */) {
@@ -100,5 +99,9 @@ public class HandEvaluator {
     
     private static Card getHighCard(List<Card> cards) {
         return CardUtils.getHighestCard(cards);
+    }
+
+    private static Card getLowCard(List<Card> cards){
+        return CardUtils.getLowestCard(cards);
     }
 }

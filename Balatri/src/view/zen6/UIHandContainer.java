@@ -125,6 +125,8 @@ public final class UIHandContainer implements UIObject {
             UICard card = cards.get(i);
             int x = this.x + 20 + i * 135;
             int y = this.y + 35;
+
+            if(card.isSelected())y -=20;
             cards.set(i, new UICard(card.card(), x, y, 120, 180, zDepth + 1, card.isSelected()));
         }
     }

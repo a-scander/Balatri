@@ -10,7 +10,6 @@ import event.OutputEvent.GameEvent;
 /*Not a simple class but still in domain package, maybe to move to another one */
 public class Blind {
     private final String name;
-    public boolean isRunning;
     private final BlindType type; // Will be useful once we implement special effects blind ? 
     private final int targetScore;
     private int score;
@@ -19,7 +18,6 @@ public class Blind {
 	public int discardCurrent;
     public int discardPerBlind;
 	private final Deck deck;
-    private final List<Card> discard = new ArrayList<>();
     private final Hand hand;
     private final List<Card> selectedCards = new ArrayList<>();
 
@@ -30,7 +28,6 @@ public class Blind {
             throw new IllegalArgumentException("Target score must be positive");
         }
         this.name = name;
-        this.isRunning = false;
         this.type = type;
         this.targetScore = targetScore;
         this.score = 0;
@@ -71,7 +68,7 @@ public class Blind {
     public void playHand(int score){
         this.score += score;
         handsCurrent++;
-        discard.addAll(selectedCards);
+        deck.discardCards(selectedCards);
         selectedCards.clear();
     }
 
@@ -84,14 +81,14 @@ public class Blind {
     public void discard() {
         if(discardCurrent >= discardPerBlind)return;
         discardCurrent++;
-        discard.addAll(selectedCards);
+        deck.discardCards(selectedCards);
         selectedCards.clear();
     }
 
     public void discardFullHand() {
         if(discardCurrent >= discardPerBlind)return;
         discardCurrent++;
-        discard.addAll(hand.getCards());
+        deck.discardCards(hand.getCards());
         hand.getCards().clear();
     }
 

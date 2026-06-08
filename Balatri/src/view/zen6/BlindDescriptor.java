@@ -28,18 +28,18 @@ public final class BlindDescriptor implements UIObject {
         int rowHeight = (height - padding) / 2;
         int colWidth = (width - padding * 3) / 2;
 
-        this.blindName = new UIRectangle(blind.getName(), x, y, width - padding * 2, rowHeight, zDepth + 1);
+        this.blindName = new UIRectangle(((blind == null) ? "":blind.getName()), x, y, width - padding * 2, rowHeight, zDepth + 1);
 
         this.blindType = new UIRectangle("Type : ?To add", x, y + padding + rowHeight, colWidth, rowHeight, zDepth + 1);
 
-        this.targetScore = new UIRectangle("Target : " + blind.getTargetScore(), x + padding + colWidth, y + padding + rowHeight, colWidth, rowHeight, zDepth + 1);
+        this.targetScore = new UIRectangle("Target : " + ((blind == null) ? "":blind.getTargetScore()), x + padding + colWidth, y + padding + rowHeight, colWidth, rowHeight, zDepth + 1);
     }
 
     @Override
     public void draw(Graphics2D graphics) {
-        blindName.draw(graphics);
+        /*blindName.draw(graphics);
         blindType.draw(graphics);
-        targetScore.draw(graphics);
+        targetScore.draw(graphics);*/
     }
 
     @Override

@@ -28,11 +28,9 @@ public class BlindSelectionScreen extends UIScreen {
         this.infoMenu = new InfoMenu(30, 30, 580, 700, 5, state);
 
         var blinds = state.getBlinds();
-        
-        for(int i = 0; i < blinds.size(); i++){
-            Blind blind = blinds.get(i);
-            int y = blind == state.getCurrentBlind() ? 200 : 220;
-            var UIblind = new UIBlind(750 + i * 240, y, 220, 320, 1, blinds.get(i), blind == state.getCurrentBlind());
+        for(int i = state.blindIndex / 3; i < 3; i++){
+            int y = (i == state.blindIndex % 3) ? 200 : 220;
+            var UIblind = new UIBlind(750 + i * 240, y, 220, 320, 1, blinds.get(i), i == state.blindIndex % 3);
             this.UIblinds.add(UIblind);
             getUIObjects().add(UIblind);
             getUIObjects().add(UIblind.selectButton);

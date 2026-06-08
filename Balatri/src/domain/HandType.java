@@ -9,7 +9,9 @@ public enum HandType {
     FLUSH(35, 4),
     FULL_HOUSE(40, 4),
     FOUR_OF_A_KIND(60, 7),
-    STRAIGHT_FLUSH(100, 8);
+    ROYAL_FLUSH(80, 8),
+    STRAIGHT_FLUSH(100, 8),
+    FIVE_OF_A_KIND(120, 12);
 
     private final Score score;
 
