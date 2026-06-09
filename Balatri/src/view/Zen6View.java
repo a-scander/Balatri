@@ -53,8 +53,8 @@ public final class Zen6View implements View {
             case HandChangeEvent hce -> processHandChangeEvent(hce);
             
             case BlindBeaten _, BlindOnGoing _ -> {}
-            case GameOver _ -> {screen = EndScreen.fromScreen(this.screen, context, "You Lost");}
-            case GameWon _ -> {screen = EndScreen.fromScreen(this.screen, context, "You Win");}
+            case GameOver _ -> buildPhaseUI(Phase.GAME_OVER, "You Lost");
+            case GameWon _ ->  buildPhaseUI(Phase.GAME_OVER, "You Win");
             case PhaseChange pc -> buildPhaseUI(pc.phase());
             case GameClosed _ -> {IO.println("Game closed.");running = false;context.dispose();System.exit(0);}
             case null -> {}
@@ -143,8 +143,7 @@ public final class Zen6View implements View {
             context.dispose();
         }
         if(ke.key() == KeyboardEvent.Key.SPACE){
-            this.queueAction.accept(PlayerAction.PLAY_HAND, null);
-            redraw();
+            if(controller.getState().getCurrentBlind() != null) this.queueAction.accept(PlayerAction.PLAY_HAND, null);
         }
     }
 
@@ -172,5 +171,12 @@ public final class Zen6View implements View {
             default -> {}
         }
         redraw();
+    }
+
+    private void buildPhaseUI(Phase phase, String message){
+        switch(phase){
+            case GAME_OVER -> this.screen = EndScreen.fromScreen(screen, context, message);
+            default -> buildPhaseUI(phase);
+        }
     }
 }

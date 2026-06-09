@@ -2,7 +2,6 @@ package view.zen6.screens;
 
 import java.util.List;
 
-import domain.Blind;
 import event.InputEvent.PlayerAction;
 import model.GameState;
 import view.zen6.Button;
